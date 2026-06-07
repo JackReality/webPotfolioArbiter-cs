@@ -75,3 +75,12 @@ dotnet run
 - HTTPS : **https://localhost:7178**
 
 Ports définis dans `Properties/launchSettings.json` (modifiables).
+
+## Instructions de sauvegarde
+
+Lorsque vous demandez une sauvegarde, veuillez effectuer les actions suivantes :
+
+1. Faites un commit Git local avec un message descriptif
+2. Poussez les modifications vers GitHub à l'adresse : https://github.com/JackReality/webPotfolioArbiter-cs.git
+
+Ces instructions sont à suivre automatiquement lors des demandes de sauvegarde.

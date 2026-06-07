@@ -1,0 +1,261 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "download": "Télécharger",
+    "formation": "Formation",
+    "forum": "Forum",
+    "login": "Connexion",
+    "signup": "Créer un compte",
+    "logout": "Déconnexion",
+    "profile": "Mon profil",
+    "copySheet": "Copier la feuille",
+    "clientArea": "Espace Client"
+  },
+  "hero": {
+    "overline": "La boussole de vos investissements",
+    "title": "Portfolio Arbiter",
+    "subtitle": "La Google Sheet qui vous accompagne dans la gestion de votre portefeuille d'investissement",
+    "description": "Une feuille Google Sheets puissante et intuitive pour suivre, analyser et optimiser vos investissements en bourse.",
+    "ctaCopy": "Obtenir la feuille",
+    "ctaLearn": "Découvrir la formation"
+  },
+  "moreThanSheet": {
+    "title": "Bien plus qu'un tableur !",
+    "desc": "Empiler des titres, de l'immobilier, des options ou des ETF dans votre portefeuille n'a pas de sens.\n\nChaque achat doit correspondre à une stratégie claire, que vous avez définie et formalisée.\n\nPortfolio Arbiter vous permet de répartir votre capital en stratégies dans lesquelles vous placez vos allocations et positions conformément à votre choix d'investissement.\n\nIl devient alors possible d'avoir le même instrument dans plusieurs stratégies, avec des règles d'entrée et de sortie différentes. Chez votre broker, vous ne voyez qu'une ligne, alors qu'il y en a plusieurs dans la vision par stratégie."
+  },
+  "position": {
+    "title": "Une position",
+    "desc": "Une position correspond au bien que vous détenez, elle est le résultat de toutes vos transactions sur ce titre.\n\nVous bénéficiez d'une vision condensée de la position, incluant l'impact du taux de change depuis votre première transaction.\n\nExemple : un achat en dollars a impacté votre marge de 715 CHF."
+  },
+  "strategy": {
+    "title": "Répartir par stratégie",
+    "groupByStrategy": "Répartir par stratégie",
+    "groupByStrategyDesc": "Groupez vos titres par stratégies et analysez vos rendements avec précision.\n\nCette organisation vous apporte du sens, car elle reflète vos investissements classés par les stratégies et allocations, que vous avez créés.",
+    "ownCash": "Chaque stratégie dispose de son propre cash",
+    "ownCashDesc": "Chaque transaction augmente ou diminue le solde correspondant. La valeur réelle d'une stratégie correspond à vos investissements plus le cash associé.",
+    "autoConvert": "Tout est automatiquement converti dans votre monnaie de référence",
+    "autoConvertDesc": "Tout est automatiquement converti dans votre monnaie de référence pour faciliter la comparaison et l'analyse."
+  },
+  "transactions": {
+    "title": "Les transactions",
+    "desc": "Une position regroupe toutes les transactions liées à un titre dans la stratégie choisie.\n\nVous pouvez combiner actions, options, dividendes, rentes, etc.\n\nLe prix d'achat est recalculé dynamiquement à chaque transaction.\n\nAinsi, un dividende ou une vente de call couvert réduit automatiquement votre prix d'acquisition."
+  },
+  "performance": {
+    "title": "Votre vrai rendement",
+    "desc": "Votre broker donne un rendement biaisé : il se limite à la moyenne des performances de vos positions, sans intégrer l'effet des variations de change ni la réalité du capital mobilisé.\n\nLe capital dormant ou non exploité est ignoré, ce qui réduit en fait votre rendement réel.\n\nComparez vos rendements par devise et mesurez l'impact des taux de change sur votre portefeuille.\n\nContrairement à votre courtier, Portfolio Arbiter convertit chaque transaction au taux en vigueur le jour où elle a eu lieu, et non simplement vos profits en monnaie de référence.\n\nComme vous affectez une partie précise de votre capital à chaque stratégie, vous pouvez calculer le rendement exact de chacune d'elles."
+  },
+  "arbitrage": {
+    "title": "L'arbitrage",
+    "desc": "Portfolio Arbiter vous permet de définir des répartitions cibles pour vos stratégies, allocations et positions.\n\nLa page d'arbitrage calcule automatiquement les montants à acheter ou à vendre pour rétablir l'équilibre souhaité.\n\nTous les montants sont convertis dans votre monnaie de référence pour une cohérence parfaite.\n\nEffectuez les opérations d'achat ou de vente pour chaque ligne, puis créez les transactions réalisées. Faites cela pour toutes les lignes et, à la fin, votre portefeuille est intégralement rééquilibré.\n\nEn pratique, un arbitrage s'effectue généralement une à quatre fois par an."
+  },
+  "features": {
+    "title": "Pourquoi PortfolioArbiter ?",
+    "tracking": {
+      "title": "Suivi complet",
+      "desc": "Suivez tous vos actifs en temps réel avec une vue d'ensemble claire et détaillée."
+    },
+    "analysis": {
+      "title": "Analyse poussée",
+      "desc": "Des indicateurs techniques et fondamentaux intégrés pour des décisions éclairées."
+    },
+    "customizable": {
+      "title": "100% Personnalisable",
+      "desc": "Adaptez la feuille à votre stratégie d'investissement unique."
+    }
+  },
+  "howItWorks": {
+    "title": "Comment ça marche ?",
+    "step1": "Créez un compte gratuit",
+    "step2": "Accédez au lien de copie Google Sheets",
+    "step3": "Personnalisez selon vos besoins"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "displayName": "Pseudo",
+    "photo": "Photo de profil",
+    "signIn": "Se connecter",
+    "signUp": "S'inscrire",
+    "forgotPassword": "Mot de passe oublié ?",
+    "alreadyHaveAccount": "Déjà un compte ?",
+    "noAccount": "Pas encore de compte ?",
+    "createAccount": "Créer un compte",
+    "loginSubtitle": "Connectez-vous pour accéder à PortfolioArbiter",
+    "signupSubtitle": "Créez votre compte PortfolioArbiter",
+    "displayNamePlaceholder": "Votre pseudo",
+    "passwordMismatch": "Les mots de passe ne correspondent pas",
+    "newPassword": "Nouveau mot de passe",
+    "updatePassword": "Mettre à jour le mot de passe",
+    "passwordUpdated": "Mot de passe mis à jour.",
+    "resetTitle": "Réinitialiser le mot de passe",
+    "resetSubtitle": "Entrez votre email pour recevoir un lien de réinitialisation.",
+    "sendResetLink": "Envoyer le lien",
+    "resetSent": "Si un compte existe pour cette adresse, un e-mail de réinitialisation vient d'être envoyé.",
+    "backToLogin": "Retour à la connexion",
+    "resetNewTitle": "Choisir un nouveau mot de passe",
+    "signupSentTitle": "Vérifiez votre boîte mail",
+    "signupSent": "Un e-mail de confirmation vient de vous être envoyé. Cliquez sur le lien pour activer votre compte. Pensez à vérifier vos spams."
+  },
+  "profile": {
+    "title": "Mon profil",
+    "update": "Mettre à jour",
+    "changePhoto": "Changer la photo",
+    "language": "Langue",
+    "save": "Enregistrer",
+    "adminPanel": "Accès administrateur",
+    "updated": "Profil mis à jour !",
+    "photoUpdated": "Photo mise à jour !",
+    "updateError": "Erreur : {{message}}",
+    "uploadError": "Erreur upload : {{message}}",
+    "changePassword": "Changer le mot de passe",
+    "removePhoto": "Supprimer la photo",
+    "photoRemoved": "Photo supprimée.",
+    "roles": {
+      "admin": "Admin",
+      "client": "Client",
+      "subscriber": "Abonné",
+      "visitor": "Visiteur"
+    }
+  },
+  "admin": {
+    "title": "Administration",
+    "subtitle": "Paramétrages et gestion du site",
+    "back": "Retour à l'administration",
+    "users": {
+      "title": "Utilisateurs",
+      "desc": "Voir et gérer les comptes utilisateurs et leurs rôles.",
+      "colName": "Pseudo",
+      "colEmail": "Email",
+      "colRole": "Rôle",
+      "colRegistered": "Inscrit le",
+      "loadError": "Impossible de charger les utilisateurs.",
+      "roleUpdated": "Rôle mis à jour.",
+      "roleUpdateError": "Échec de la mise à jour du rôle.",
+      "searchPlaceholder": "Rechercher par pseudo ou email",
+      "protected": "Compte admin protégé",
+      "note": "Seuls les comptes de test (pseudo commençant par « Test ») peuvent être supprimés.",
+      "colActions": "Actions",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer définitivement ce compte de test ? Cette action est irréversible.",
+      "deleteError": "Échec de la suppression."
+    },
+    "emailTemplates": {
+      "title": "Templates d'emails",
+      "desc": "Modifier les modèles de mails (confirmation, récupération) en FR/EN/ES.",
+      "subject": "Sujet",
+      "body": "Corps (HTML)",
+      "save": "Enregistrer",
+      "saved": "Template enregistré.",
+      "saveError": "Échec de l'enregistrement.",
+      "loadError": "Impossible de charger les templates.",
+      "copy": "Copier",
+      "copied": "Copié !",
+      "variables": {
+        "title": "Variables disponibles",
+        "hint": "Cliquez pour copier, puis collez dans le sujet ou le corps. Elles sont remplacées automatiquement à l'envoi.",
+        "confirmationUrl": "Lien de confirmation / réinitialisation"
+      },
+      "types": {
+        "confirm_signup": "Confirmation d'inscription",
+        "recovery": "Réinitialisation du mot de passe",
+        "welcome": "E-mail de bienvenue"
+      }
+    }
+  },
+  "forum": {
+    "title": "Forum des clients",
+    "newPost": "Nouveau sujet",
+    "reply": "Répondre",
+    "bug": "Bug",
+    "feature": "Demande",
+    "discussion": "Discussion",
+    "tags": "Tags",
+    "comingSoon": "Forum en construction",
+    "comingSoonDesc": "Le forum sera bientôt disponible. Vous y pourrez partager des bugs et des demandes d'amélioration."
+  },
+  "formation": {
+    "title": "Formation PortfolioArbiter",
+    "description": "Maîtrisez l'utilisation avancée de la feuille et développez votre propre stratégie d'investissement.",
+    "buy": "Acheter la formation",
+    "includes": "Ce qui est inclus",
+    "videos": "Vidéos explicatives",
+    "pdf": "Guides PDF",
+    "support": "Support prioritaire",
+    "videosDesc": "Vidéos explicatives pour maîtriser chaque fonctionnalité de la feuille.",
+    "pdfDesc": "Guides PDF détaillés pour référence et approfondissement.",
+    "supportDesc": "Accès prioritaire au support et au forum des clients.",
+    "comingSoon": "Formation en préparation",
+    "comingSoonDesc": "La formation est en cours de développement. Revenez bientôt !",
+    "notifyLogin": "Connectez-vous pour être informé du lancement."
+  },
+  "copy": {
+    "restricted": "Accès réservé",
+    "restrictedDesc": "Vous devez avoir un compte pour accéder à la feuille. La formation payante donne accès à des fonctionnalités avancées.",
+    "instructions": "Cliquez sur le bouton ci-dessous pour copier la feuille PortfolioArbiter dans votre Google Drive.",
+    "button": "Copier la feuille Google Sheets",
+    "redirectNote": "Vous serez redirigé vers Google Sheets. La feuille sera copiée dans votre Drive personnel."
+  },
+  "footer": {
+    "rights": "Tous droits réservés",
+    "legal": "Informations légales"
+  },
+  "common": {
+    "loading": "Chargement…",
+    "notFound": {
+      "title": "Page introuvable",
+      "desc": "La page que vous cherchez n'existe pas ou a été déplacée."
+    },
+    "error": {
+      "title": "Cette page n'a pas pu se charger",
+      "desc": "Une erreur est survenue de notre côté. Essayez de rafraîchir ou de revenir à l'accueil.",
+      "retry": "Réessayer"
+    }
+  },
+  "legal": {
+    "title": "Informations légales",
+    "intro": "Conditions générales, politique de confidentialité et mentions légales de Portfolio Arbiter (Reality Explorer Sàrl).",
+    "tabs": {
+      "cgv": "Conditions générales",
+      "privacy": "Confidentialité",
+      "mentions": "Mentions légales"
+    },
+    "cgv": {
+      "title": "Conditions Générales de Vente et d'Utilisation (CGV/CGU)",
+      "articles": [
+        { "title": "1. Objet", "content": "Les présentes conditions régissent les relations contractuelles entre Reality Explorer Sàrl (ci-après « RE »), dont le siège social est situé à Givisiez (Suisse), et toute personne physique ou morale (ci-après « le Client ») souhaitant acquérir des produits ou services via le site PortfolioArbiter.com." },
+        { "title": "2. Licence d'utilisation des feuilles Google Sheets", "content": "RE met à disposition du Client des outils de gestion propriétaires hébergés sur la plateforme Google Sheets.\n\nLicence privée : RE accorde au Client une licence d'utilisation personnelle, non exclusive et non transférable.\n\nRestrictions strictes : Le Client est autorisé à utiliser ces feuilles uniquement pour son propre compte. Il est formellement interdit de distribuer, revendre, sous-licencier, partager publiquement ou modifier ces documents pour le compte de tiers.\n\nSanctions et clause pénale : Toute violation de cette clause ou toute tentative de contournement des restrictions d'accès entraînera la révocation immédiate, définitive et de plein droit de tous les accès du Client, sans préavis ni mise en demeure, et sans droit à aucun remboursement. En outre, le contrevenant sera immédiatement redevable de plein droit d'une pénalité forfaitaire et irréductible de CHF 50'000.- (cinquante mille francs suisses) par infraction constatée, à titre de clause pénale. RE engagera des poursuites judiciaires immédiates devant les tribunaux compétents pour violation de la loi fédérale sur le droit d'auteur (LDA) et exigera la réparation intégrale du préjudice commercial, technique et moral subi." },
+        { "title": "3. Formations et stratégies financières", "content": "RE propose des formations payantes expliquant l'utilisation technique des outils et exposant des méthodes de stratégie financière.\n\nAvertissement : Ces formations ont un but strictement éducatif. RE ne fournit pas de conseil en investissement personnalisé. Le Client est seul responsable de ses décisions financières et des risques pris sur les marchés.\n\nResponsabilité : RE ne peut être tenue responsable des pertes financières résultant de l'application des stratégies enseignées ou de l'utilisation des feuilles de calcul." },
+        { "title": "4. Tarifs et paiement", "content": "Les prix sont indiqués en TTC sur le site web. Le paiement est dû immédiatement à la commande. Pour les accès récurrents, le prélèvement est automatique à chaque période. Le Client peut annuler son abonnement jusqu'à 5 jours avant la date de renouvellement." },
+        { "title": "5. Absence de droit de rétractation", "content": "Conformément à la législation sur les contenus numériques, le Client reconnaît qu'en accédant aux feuilles Google Sheets ou aux modules de formation, il bénéficie d'une exécution immédiate du service et renonce expressément à son droit de rétractation. Aucun remboursement ne sera effectué après la livraison des accès." },
+        { "title": "6. Propriété intellectuelle", "content": "L'ensemble des structures, formules, scripts et contenus pédagogiques demeure la propriété exclusive de RE. Aucun droit de propriété n'est transféré au Client, seule une licence d'utilisation lui est accordée." },
+        { "title": "7. Limitation de responsabilité", "content": "RE ne pourra être tenue responsable des dommages indirects ou des pertes financières liés à l'utilisation des produits. RE ne garantit pas la disponibilité permanente des services tiers (Google Cloud/Sheets) nécessaires au fonctionnement des outils." },
+        { "title": "8. Faillite et pérennité", "content": "En cas de faillite ou de cessation d'activité de RE, les obligations de service cessent immédiatement. Le Client accepte le risque inhérent à la pérennité d'un service numérique et renonce à toute demande de compensation en cas d'arrêt définitif des plateformes." },
+        { "title": "9. Droit applicable et juridiction", "content": "Les présentes CGV sont régies par le droit suisse. Tout litige relatif à leur exécution relève de la compétence exclusive des tribunaux de la ville de Fribourg." }
+      ]
+    },
+    "privacy": {
+      "title": "Politique de confidentialité",
+      "intro": "La protection de vos données personnelles est une priorité pour Reality Explorer Sàrl. Cette politique détaille comment nous traitons vos informations sur le site PortfolioArbiter.com.",
+      "articles": [
+        { "title": "1. Collecte des données", "content": "Pour accéder aux services, au téléchargement des feuilles Google Sheets et aux formations, l'inscription d'un compte utilisateur est obligatoire. Nous collectons à cette occasion :\n\n• Votre nom et prénom.\n• Votre adresse e-mail (pour l'envoi des accès et la communication).\n• Vos informations de facturation (via nos prestataires de paiement sécurisés)." },
+        { "title": "2. Utilisation des données", "content": "Vos données sont utilisées exclusivement pour :\n\n• Gérer votre compte et vos accès aux outils numériques.\n• Assurer le suivi des formations et du coaching.\n• Répondre à vos demandes de support client.\n• Respecter nos obligations légales et comptables en Suisse." },
+        { "title": "3. Partage des données", "content": "Vos données ne sont jamais vendues à des tiers. Elles ne sont partagées qu'avec les prestataires strictement nécessaires au fonctionnement du service :\n\n• Google Cloud/Drive : pour l'hébergement et l'utilisation des feuilles Google Sheets.\n• Stripe/Banques : pour la sécurisation des paiements.\n• Infomaniak : pour l'hébergement du site et des emails." },
+        { "title": "4. Cookies", "content": "Le site utilise des cookies techniques essentiels pour maintenir votre connexion active et assurer la sécurité de votre espace membre. En utilisant le site, vous acceptez l'utilisation de ces cookies nécessaires au service." },
+        { "title": "5. Sécurité", "content": "Nous mettons en œuvre des mesures de sécurité techniques pour protéger vos informations contre tout accès non autorisé. Toutefois, le Client reconnaît que la transmission de données sur Internet comporte des risques intrinsèques." },
+        { "title": "6. Vos droits", "content": "Conformément à la Loi fédérale sur la protection des données (LPD) et au RGPD, vous disposez d'un droit d'accès, de rectification et de suppression de vos données personnelles. Vous pouvez exercer ces droits en nous contactant directement à l'adresse email de support." },
+        { "title": "7. Durée de conservation", "content": "Les données liées à votre compte sont conservées tant que votre licence ou abonnement est actif. Les données comptables sont conservées pendant la durée légale de 10 ans prévue par le droit suisse." }
+      ]
+    },
+    "mentions": {
+      "title": "Mentions légales",
+      "articles": [
+        { "title": "1. Éditeur du site", "content": "Le site PortfolioArbiter.com est édité par la société :\n\nReality Explorer Sàrl\nRue Robert-Stalder 15\n1762 Givisiez\nSuisse\n\nNuméro d'identification des entreprises (IDE) : CHE-406.920.591" },
+        { "title": "2. Responsable de publication", "content": "Le responsable de la publication et du contenu est M. Grillet." },
+        { "title": "3. Hébergement", "content": "Le site est hébergé par :\n\nInfomaniak Network SA\nRue Eugène-Marziano 25\n1227 Les Acacias, Genève\nSuisse" },
+        { "title": "4. Propriété intellectuelle", "content": "L'ensemble du contenu (textes, logos, structures de calcul, vidéos) présent sur ce site est la propriété exclusive de Reality Explorer Sàrl. Toute reproduction ou distribution non autorisée est strictement interdite." },
+        { "title": "5. Contact", "content": "Email : {{email}}" }
+      ]
+    }
+  }
+}

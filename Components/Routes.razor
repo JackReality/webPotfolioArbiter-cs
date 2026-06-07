@@ -1,0 +1,24 @@
+@using Microsoft.AspNetCore.Components.Authorization
+@using Portfolio.Components.Pages
+
+<Router AppAssembly="typeof(Program).Assembly" NotFoundPage="typeof(Pages.NotFound)">
+    <Found Context="routeData">
+        @* AuthorizeRouteView = comme RouteView, mais il fait respecter les
+           attributs [Authorize] / [Authorize(Roles=...)] des pages. *@
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
+            <NotAuthorized>
+                @if (context.User.Identity?.IsAuthenticated != true)
+                {
+                    @* Pas connecté → vers la page de connexion *@
+                    <RedirectToLogin />
+                }
+                else
+                {
+                    @* Connecté mais rôle insuffisant → page "accès réservé" *@
+                    <AccesReserve />
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+</Router>

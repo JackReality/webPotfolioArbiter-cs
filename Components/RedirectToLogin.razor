@@ -1,0 +1,12 @@
+@inject NavigationManager Nav
+
+@code {
+    // Quand une page [Authorize] est demandée par un visiteur NON connecté,
+    // on le renvoie vers /login en mémorisant la page voulue (returnUrl),
+    // pour l'y ramener après connexion.
+    protected override void OnInitialized()
+    {
+        var cible = "/" + Nav.ToBaseRelativePath(Nav.Uri);
+        Nav.NavigateTo($"/login?returnUrl={Uri.EscapeDataString(cible)}", forceLoad: false);
+    }
+}

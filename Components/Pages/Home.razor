@@ -1,0 +1,124 @@
+@page "/"
+@inject IStringLocalizer<SharedResource> L
+
+<PageTitle>@L["Home.Hero.Title"]</PageTitle>
+
+@* ===================== SECTION 1 : Hero + "Bien plus qu'un tableur" ===================== *@
+<section class="pa-section" style="background-image:url('images/cahier.jpg')">
+    <div class="pa-section__inner">
+        <div class="pa-card pa-hero-card">
+            <p class="pa-kicker">@L["Home.Hero.Kicker"]</p>
+            <div class="pa-underline"></div>
+            <h1 class="pa-hero-title">@L["Home.Hero.Title"]</h1>
+            <p class="pa-hero-sub">@L["Home.Hero.Subtitle"]</p>
+        </div>
+
+        <div class="pa-grid">
+            <div class="pa-card">
+                <h2 class="pa-card__title">@L["Home.S1.Title"]</h2>
+                <div class="pa-underline"></div>
+                <p class="pa-body">@L["Home.S1.Body"]</p>
+            </div>
+            <div class="pa-shot-wrap">
+                <img src="images/ticker-site.png" alt="@L["Home.S1.Title"]" class="pa-shot" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="pa-separator"><div class="pa-separator__line"></div></div>
+
+@* ===================== SECTION 2 : Une position (image gauche) ===================== *@
+<section class="pa-section" style="background-image:url('images/position-book.png')">
+    <div class="pa-section__inner">
+        <div class="pa-grid">
+            <div class="pa-shot-wrap">
+                <img src="images/position-site.png" alt="@L["Home.S2.Title"]" class="pa-shot" />
+            </div>
+            <div class="pa-card">
+                <h2 class="pa-card__title">@L["Home.S2.Title"]</h2>
+                <div class="pa-underline"></div>
+                <p class="pa-body">@L["Home.S2.Body"]</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="pa-separator"><div class="pa-separator__line"></div></div>
+
+@* ===================== SECTION 3 : Répartir par stratégie (texte gauche) ===================== *@
+<section class="pa-section" style="background-image:url('images/strategie-book.png')">
+    <div class="pa-section__inner">
+        <div class="pa-grid">
+            <div class="pa-card">
+                <h2 class="pa-card__title">@L["Home.S3.Title"]</h2>
+                <div class="pa-underline"></div>
+                <div class="pa-body">
+                    <h3 class="pa-subtitle">@L["Home.S3.Sub1.Title"]</h3>
+                    <p class="pa-body">@L["Home.S3.Sub1.Body"]</p>
+                    <h3 class="pa-subtitle">@L["Home.S3.Sub2.Title"]</h3>
+                    <p class="pa-body">@L["Home.S3.Sub2.Body"]</p>
+                    <h3 class="pa-subtitle">@L["Home.S3.Sub3.Title"]</h3>
+                    <p class="pa-body">@L["Home.S3.Sub3.Body"]</p>
+                </div>
+            </div>
+            <div class="pa-shot-wrap">
+                <img src="images/strategy-site.png" alt="@L["Home.S3.Title"]" class="pa-shot" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="pa-separator"><div class="pa-separator__line"></div></div>
+
+@* ===================== SECTION 4 : Les transactions (image gauche) ===================== *@
+<section class="pa-section" style="background-image:url('images/transactions-book.png')">
+    <div class="pa-section__inner">
+        <div class="pa-grid">
+            <div class="pa-shot-wrap">
+                <img src="images/transaction-site.png" alt="@L["Home.S4.Title"]" class="pa-shot" />
+            </div>
+            <div class="pa-card">
+                <h2 class="pa-card__title">@L["Home.S4.Title"]</h2>
+                <div class="pa-underline"></div>
+                <p class="pa-body">@L["Home.S4.Body"]</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="pa-separator"><div class="pa-separator__line"></div></div>
+
+@* ===================== SECTION 5 : Votre vrai rendement (texte gauche) ===================== *@
+<section class="pa-section" style="background-image:url('images/rendement-book.png')">
+    <div class="pa-section__inner">
+        <div class="pa-grid">
+            <div class="pa-card">
+                <h2 class="pa-card__title">@L["Home.S5.Title"]</h2>
+                <div class="pa-underline"></div>
+                <p class="pa-body">@L["Home.S5.Body"]</p>
+            </div>
+            <div class="pa-shot-wrap">
+                <img src="images/rendement-site.png" alt="@L["Home.S5.Title"]" class="pa-shot" />
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="pa-separator"><div class="pa-separator__line"></div></div>
+
+@* ===================== SECTION 6 : L'arbitrage (image gauche) ===================== *@
+<section class="pa-section" style="background-image:url('images/arbitrage-bg.png')">
+    <div class="pa-section__inner">
+        <div class="pa-grid">
+            <div class="pa-shot-wrap">
+                <img src="images/rebalance-site.png" alt="@L["Home.S6.Title"]" class="pa-shot" />
+            </div>
+            <div class="pa-card">
+                <h2 class="pa-card__title">@L["Home.S6.Title"]</h2>
+                <div class="pa-underline"></div>
+                <p class="pa-body">@L["Home.S6.Body"]</p>
+            </div>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,11 @@
+# Secrets — ne jamais committer
+.env
+
+# Build .NET
+bin/
+obj/
+
+# IDE
+.vs/
+.vscode/
+*.user

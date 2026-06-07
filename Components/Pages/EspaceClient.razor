@@ -1,0 +1,11 @@
+@page "/espace-client"
+@* CLIENT : payé une formation (admin inclus) *@
+@attribute [Authorize(Roles = "client,admin")]
+@inject IStringLocalizer<SharedResource> L
+
+<PageTitle>Espace client</PageTitle>
+
+<div class="pa-page">
+    <MudText Typo="Typo.h3" GutterBottom="true">Espace client</MudText>
+    <MudText>@L["Common.ComingSoon"]</MudText>
+</div>

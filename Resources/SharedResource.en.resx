@@ -1,0 +1,243 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- ===== Header / footer / common ===== -->
+  <data name="Site.Name" xml:space="preserve"><value>Portfolio Arbiter</value></data>
+  <data name="Nav.Accueil" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav.Telecharger" xml:space="preserve"><value>Download</value></data>
+  <data name="Nav.Formation" xml:space="preserve"><value>Course</value></data>
+  <data name="Nav.Connexion" xml:space="preserve"><value>Log in</value></data>
+  <data name="Footer.Rights" xml:space="preserve"><value>All rights reserved</value></data>
+  <data name="Footer.Legal" xml:space="preserve"><value>Legal information</value></data>
+  <data name="Common.ComingSoon" xml:space="preserve"><value>Coming soon.</value></data>
+  <data name="Telecharger.Title" xml:space="preserve"><value>Download</value></data>
+  <data name="Formation.Title" xml:space="preserve"><value>Course</value></data>
+  <data name="Login.Title" xml:space="preserve"><value>Log in</value></data>
+
+  <!-- ===== Home : Hero ===== -->
+  <data name="Home.Hero.Kicker" xml:space="preserve"><value>The compass for your investments</value></data>
+  <data name="Home.Hero.Title" xml:space="preserve"><value>Portfolio Arbiter</value></data>
+  <data name="Home.Hero.Subtitle" xml:space="preserve"><value>The Google Sheet that helps you manage your investment portfolio</value></data>
+
+  <!-- ===== Home : sections ===== -->
+  <data name="Home.S1.Title" xml:space="preserve"><value>Much more than a spreadsheet!</value></data>
+  <data name="Home.S1.Body" xml:space="preserve"><value>Stacking stocks, real estate, options or ETFs in your portfolio makes no sense.
+
+Each purchase should match a clear strategy that you have defined and formalized.
+
+Portfolio Arbiter lets you split your capital into strategies in which you place your allocations and positions according to your investment choices.
+
+It then becomes possible to hold the same instrument across several strategies, with different entry and exit rules. At your broker, you only see one line, while there are several in the strategy view.</value></data>
+
+  <data name="Home.S2.Title" xml:space="preserve"><value>A position</value></data>
+  <data name="Home.S2.Body" xml:space="preserve"><value>A position represents the asset you hold; it is the result of all your transactions on that security.
+
+You get a condensed view of the position, including the impact of the exchange rate since your first transaction.
+
+Example: a purchase in dollars has affected your margin by 715 CHF.</value></data>
+
+  <data name="Home.S3.Title" xml:space="preserve"><value>Split by strategy</value></data>
+  <data name="Home.S3.Sub1.Title" xml:space="preserve"><value>Split by strategy</value></data>
+  <data name="Home.S3.Sub1.Body" xml:space="preserve"><value>Group your holdings by strategies and analyze your returns with precision.
+
+This organization makes sense because it reflects your investments sorted by the strategies and allocations you have created.</value></data>
+  <data name="Home.S3.Sub2.Title" xml:space="preserve"><value>Each strategy has its own cash</value></data>
+  <data name="Home.S3.Sub2.Body" xml:space="preserve"><value>Each transaction increases or decreases the corresponding balance. The real value of a strategy equals your investments plus the associated cash.</value></data>
+  <data name="Home.S3.Sub3.Title" xml:space="preserve"><value>Everything is automatically converted to your reference currency</value></data>
+  <data name="Home.S3.Sub3.Body" xml:space="preserve"><value>Everything is automatically converted into your reference currency to make comparison and analysis easier.</value></data>
+
+  <data name="Home.S4.Title" xml:space="preserve"><value>Transactions</value></data>
+  <data name="Home.S4.Body" xml:space="preserve"><value>A position aggregates every transaction tied to a security in the chosen strategy.
+
+You can combine stocks, options, dividends, interest, etc.
+
+The purchase price is dynamically recalculated on each transaction.
+
+So a dividend or a covered call sale automatically reduces your acquisition price.</value></data>
+
+  <data name="Home.S5.Title" xml:space="preserve"><value>Your true return</value></data>
+  <data name="Home.S5.Body" xml:space="preserve"><value>Your broker gives a biased return: it only averages the performance of your positions, without factoring in FX variations or the reality of capital deployed.
+
+Dormant or unused capital is ignored, which actually lowers your real return.
+
+Compare your returns by currency and measure the impact of exchange rates on your portfolio.
+
+Unlike your broker, Portfolio Arbiter converts each transaction at the rate in effect on the day it happened, not just your profits in your reference currency.
+
+Since you allocate a precise share of your capital to each strategy, you can compute the exact return of every one of them.</value></data>
+
+  <data name="Home.S6.Title" xml:space="preserve"><value>Rebalancing</value></data>
+  <data name="Home.S6.Body" xml:space="preserve"><value>Portfolio Arbiter lets you define target allocations for your strategies, allocations and positions.
+
+The rebalancing page automatically computes the amounts to buy or sell to restore the desired balance.
+
+All amounts are converted into your reference currency for perfect consistency.
+
+Execute the buy or sell operations for each line, then record the completed transactions. Do this for every line and, in the end, your portfolio is fully rebalanced.
+
+In practice, rebalancing is typically done one to four times per year.</value></data>
+
+  <!-- ===== Legal ===== -->
+  <data name="Legal.Title" xml:space="preserve"><value>Legal information</value></data>
+  <data name="Legal.Intro" xml:space="preserve"><value>General terms, privacy policy and legal notice for Portfolio Arbiter (Reality Explorer Sàrl).</value></data>
+  <data name="Legal.Tab.Cgv" xml:space="preserve"><value>Terms &amp; Conditions</value></data>
+  <data name="Legal.Tab.Privacy" xml:space="preserve"><value>Privacy</value></data>
+  <data name="Legal.Tab.Mentions" xml:space="preserve"><value>Legal notice</value></data>
+
+  <data name="Legal.Cgv.Heading" xml:space="preserve"><value>General Terms of Sale and Use (T&amp;Cs)</value></data>
+  <data name="Legal.Cgv.S1.Title" xml:space="preserve"><value>1. Purpose</value></data>
+  <data name="Legal.Cgv.S1.Body" xml:space="preserve"><value>These terms govern the contractual relationship between Reality Explorer Sàrl (hereinafter "RE"), with registered office in Givisiez (Switzerland), and any individual or legal entity (hereinafter "the Client") wishing to acquire products or services through the PortfolioArbiter.com website.</value></data>
+  <data name="Legal.Cgv.S2.Title" xml:space="preserve"><value>2. License to use the Google Sheets files</value></data>
+  <data name="Legal.Cgv.S2.Body" xml:space="preserve"><value>RE provides the Client with proprietary management tools hosted on the Google Sheets platform.
+
+Private license: RE grants the Client a personal, non-exclusive and non-transferable license of use.
+
+Strict restrictions: The Client is authorized to use these sheets only for their own account. Distributing, reselling, sublicensing, publicly sharing or modifying these documents on behalf of third parties is strictly forbidden.
+
+Sanctions and penalty clause: Any breach of this clause or any attempt to circumvent access restrictions will trigger the immediate, definitive and automatic revocation of all Client accesses, without notice or formal demand, and without any right to a refund. Furthermore, the offender will immediately owe, as of right, a flat and irreducible penalty of CHF 50,000 (fifty thousand Swiss francs) per recorded infringement, as a penalty clause. RE will initiate immediate legal proceedings before the competent courts for violation of the Swiss Federal Copyright Act (LDA) and will demand full compensation for the commercial, technical and moral damage suffered.</value></data>
+  <data name="Legal.Cgv.S3.Title" xml:space="preserve"><value>3. Courses and financial strategies</value></data>
+  <data name="Legal.Cgv.S3.Body" xml:space="preserve"><value>RE offers paid courses explaining the technical use of the tools and presenting financial strategy methods.
+
+Warning: These courses are strictly educational. RE does not provide personalized investment advice. The Client is solely responsible for their financial decisions and the risks taken on the markets.
+
+Liability: RE cannot be held liable for financial losses resulting from the application of the strategies taught or the use of the spreadsheets.</value></data>
+  <data name="Legal.Cgv.S4.Title" xml:space="preserve"><value>4. Pricing and payment</value></data>
+  <data name="Legal.Cgv.S4.Body" xml:space="preserve"><value>Prices are shown inclusive of all taxes on the website. Payment is due immediately upon order. For recurring access, the charge is automatic at each period. The Client may cancel their subscription up to 5 days before the renewal date.</value></data>
+  <data name="Legal.Cgv.S5.Title" xml:space="preserve"><value>5. No right of withdrawal</value></data>
+  <data name="Legal.Cgv.S5.Body" xml:space="preserve"><value>In accordance with the legislation on digital content, the Client acknowledges that by accessing the Google Sheets files or the course modules, they benefit from immediate execution of the service and expressly waive their right of withdrawal. No refund will be made after the access has been delivered.</value></data>
+  <data name="Legal.Cgv.S6.Title" xml:space="preserve"><value>6. Intellectual property</value></data>
+  <data name="Legal.Cgv.S6.Body" xml:space="preserve"><value>All structures, formulas, scripts and educational content remain the exclusive property of RE. No property right is transferred to the Client; only a license of use is granted.</value></data>
+  <data name="Legal.Cgv.S7.Title" xml:space="preserve"><value>7. Limitation of liability</value></data>
+  <data name="Legal.Cgv.S7.Body" xml:space="preserve"><value>RE cannot be held liable for indirect damages or financial losses related to the use of the products. RE does not guarantee the permanent availability of third-party services (Google Cloud/Sheets) required for the tools to function.</value></data>
+  <data name="Legal.Cgv.S8.Title" xml:space="preserve"><value>8. Bankruptcy and continuity</value></data>
+  <data name="Legal.Cgv.S8.Body" xml:space="preserve"><value>In the event of bankruptcy or cessation of activity of RE, service obligations cease immediately. The Client accepts the risk inherent to the continuity of a digital service and waives any claim for compensation in the event of permanent shutdown of the platforms.</value></data>
+  <data name="Legal.Cgv.S9.Title" xml:space="preserve"><value>9. Applicable law and jurisdiction</value></data>
+  <data name="Legal.Cgv.S9.Body" xml:space="preserve"><value>These T&amp;Cs are governed by Swiss law. Any dispute relating to their execution falls within the exclusive jurisdiction of the courts of the city of Fribourg.</value></data>
+
+  <data name="Legal.Privacy.Heading" xml:space="preserve"><value>Privacy policy</value></data>
+  <data name="Legal.Privacy.Intro" xml:space="preserve"><value>The protection of your personal data is a priority for Reality Explorer Sàrl. This policy details how we process your information on the PortfolioArbiter.com website.</value></data>
+  <data name="Legal.Privacy.S1.Title" xml:space="preserve"><value>1. Data collection</value></data>
+  <data name="Legal.Privacy.S1.Body" xml:space="preserve"><value>To access the services, downloads of the Google Sheets files and the courses, registering a user account is mandatory. We collect on this occasion:
+
+• Your first and last name.
+• Your email address (to send access information and for communication).
+• Your billing information (via our secure payment providers).</value></data>
+  <data name="Legal.Privacy.S2.Title" xml:space="preserve"><value>2. Use of data</value></data>
+  <data name="Legal.Privacy.S2.Body" xml:space="preserve"><value>Your data is used exclusively to:
+
+• Manage your account and your access to the digital tools.
+• Provide course and coaching follow-up.
+• Respond to your customer support requests.
+• Comply with our legal and accounting obligations in Switzerland.</value></data>
+  <data name="Legal.Privacy.S3.Title" xml:space="preserve"><value>3. Data sharing</value></data>
+  <data name="Legal.Privacy.S3.Body" xml:space="preserve"><value>Your data is never sold to third parties. It is only shared with the providers strictly necessary for the operation of the service:
+
+• Google Cloud/Drive: for hosting and using the Google Sheets files.
+• Stripe/Banks: for securing payments.
+• Infomaniak: for hosting the website and the emails.</value></data>
+  <data name="Legal.Privacy.S4.Title" xml:space="preserve"><value>4. Cookies</value></data>
+  <data name="Legal.Privacy.S4.Body" xml:space="preserve"><value>The site uses essential technical cookies to keep your session active and ensure the security of your member area. By using the site, you accept the use of these cookies necessary for the service.</value></data>
+  <data name="Legal.Privacy.S5.Title" xml:space="preserve"><value>5. Security</value></data>
+  <data name="Legal.Privacy.S5.Body" xml:space="preserve"><value>We implement technical security measures to protect your information against any unauthorized access. However, the Client acknowledges that the transmission of data over the Internet involves intrinsic risks.</value></data>
+  <data name="Legal.Privacy.S6.Title" xml:space="preserve"><value>6. Your rights</value></data>
+  <data name="Legal.Privacy.S6.Body" xml:space="preserve"><value>In accordance with the Swiss Federal Data Protection Act (LPD) and the GDPR, you have the right to access, rectify and delete your personal data. You can exercise these rights by contacting us directly at the support email address.</value></data>
+  <data name="Legal.Privacy.S7.Title" xml:space="preserve"><value>7. Retention period</value></data>
+  <data name="Legal.Privacy.S7.Body" xml:space="preserve"><value>Data linked to your account is kept for as long as your license or subscription is active. Accounting data is kept for the legal period of 10 years required by Swiss law.</value></data>
+
+  <data name="Legal.Mentions.Heading" xml:space="preserve"><value>Legal notice</value></data>
+  <data name="Legal.Mentions.S1.Title" xml:space="preserve"><value>1. Website publisher</value></data>
+  <data name="Legal.Mentions.S1.Body" xml:space="preserve"><value>The PortfolioArbiter.com website is published by:
+
+Reality Explorer Sàrl
+Rue Robert-Stalder 15
+1762 Givisiez
+Switzerland
+
+Swiss business identification number (IDE): CHE-406.920.591</value></data>
+  <data name="Legal.Mentions.S2.Title" xml:space="preserve"><value>2. Publication manager</value></data>
+  <data name="Legal.Mentions.S2.Body" xml:space="preserve"><value>The person responsible for publication and content is Mr. Grillet.</value></data>
+  <data name="Legal.Mentions.S3.Title" xml:space="preserve"><value>3. Hosting</value></data>
+  <data name="Legal.Mentions.S3.Body" xml:space="preserve"><value>The site is hosted by:
+
+Infomaniak Network SA
+Rue Eugène-Marziano 25
+1227 Les Acacias, Geneva
+Switzerland</value></data>
+  <data name="Legal.Mentions.S4.Title" xml:space="preserve"><value>4. Intellectual property</value></data>
+  <data name="Legal.Mentions.S4.Body" xml:space="preserve"><value>All content (text, logos, calculation structures, videos) present on this site is the exclusive property of Reality Explorer Sàrl. Any unauthorized reproduction or distribution is strictly forbidden.</value></data>
+  <data name="Legal.Mentions.S5.Title" xml:space="preserve"><value>5. Contact</value></data>
+  <data name="Legal.Mentions.ShowEmail" xml:space="preserve"><value>Show email address</value></data>
+
+  <!-- ===== Authentication ===== -->
+  <data name="Nav.Logout" xml:space="preserve"><value>Log out</value></data>
+  <data name="Auth.LoginSubtitle" xml:space="preserve"><value>Sign in to access Portfolio Arbiter</value></data>
+  <data name="Auth.Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Auth.Password" xml:space="preserve"><value>Password</value></data>
+  <data name="Auth.SignIn" xml:space="preserve"><value>Sign in</value></data>
+  <data name="Auth.ForgotPassword" xml:space="preserve"><value>Forgot password?</value></data>
+  <data name="Auth.CreateAccount" xml:space="preserve"><value>Create an account</value></data>
+  <data name="Auth.Error" xml:space="preserve"><value>Incorrect email or password.</value></data>
+  <data name="Register.Title" xml:space="preserve"><value>Create an account</value></data>
+  <data name="Reset.Title" xml:space="preserve"><value>Forgot password</value></data>
+  <data name="AccesReserve.Title" xml:space="preserve"><value>Restricted access</value></data>
+  <data name="AccesReserve.Body" xml:space="preserve"><value>This page is reserved for clients who have purchased a course.</value></data>
+  <data name="AccesReserve.Cta" xml:space="preserve"><value>View the course</value></data>
+</root>

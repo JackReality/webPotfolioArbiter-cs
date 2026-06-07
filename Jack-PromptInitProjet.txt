@@ -1,0 +1,79 @@
+FICHIER TEXTE ET NON MD
+
+Agis en tant qu'expert architecte C# .NET (8+). Crée la structure de départ d'une
+  application web Blazor, propre, SIMPLE et prête pour la production. Je débute en C#,
+  explique brièvement chaque fichier. Réponds en français.
+
+  ARCHITECTURE (à respecter strictement) :
+
+  1. RENDU : Blazor Server (render mode InteractiveServer global), PAS de WebAssembly.
+     - UN SEUL projet (pas de découpage Server/Client/Shared).
+     - Crée les fichiers À PLAT dans le dossier courant (pas de sous-dossier projet).
+     - Si le nom du dossier contient un caractère interdit (ex: #), nomme le projet
+       "Portfolio" mais garde le dossier tel quel.
+
+  2. DOSSIERS :
+     - Models/   : une classe par table (entités).
+     - Data/     : le DbContext EF Core.
+     - Services/ : la logique métier (classes injectées par DI). Un service par entité (ex: ClientService gère tout ce qui touche à Client : Add, Update, Delete, GetById, List…).
+     - Components/Pages/  et  Components/Layout/
+
+  3. PAGES EN FICHIER UNIQUE : pas de code-behind .cs. Markup en haut,
+     code C# dans un bloc @code en bas du même fichier .razor.
+
+  4. INTERFACE : MudBlazor (config dans Program.cs + providers dans le layout).
+
+  5. BASE DE DONNÉES : MySQL via EF Core + provider Pomelo.
+     - DbContext injecté par constructeur.
+     - Identifiants dans un fichier .env (chargé par DotNetEnv), ajouté au .gitignore.
+     - NE connecte PAS la base au démarrage (version serveur fixée manuellement),
+       pour que l'app démarre même sans base.
+     - crée le .env avec le mot de passe à remplacer.
+
+  5bis. ACCÈS AUX DONNÉES (Services + LINQ) :
+     - Chaque service reçoit le DbContext par injection de constructeur (jamais dans les pages).
+     - Un service par entité : ex: ClientService reçoit AppDbContext et gère Add, Update, Delete, GetById, List… pour les Clients.
+     - Les services utilisent LINQ (Where, Include, FirstOrDefault, ToListAsync…) pour interroger les DbSet<T>.
+     - Un DbSet<T> est ajouté dans AppDbContext pour chaque classe de Models/.
+       IMPORTANT : le nom du DbSet (côté C#, ex: Users) et le nom de la table MySQL sont indépendants.
+       C'est l'attribut [Table("nom_table")] sur la classe du model qui fixe le nom réel de la table.
+       EF Core utilise par défaut le pluriel du DbSet, mais [Table("...")] prime toujours.
+     - Les pages appellent des méthodes de service (await service.GetXxxAsync()), jamais de LINQ direct.
+     - SaveChangesAsync() est appelé dans le service après modification, jamais automatiquement au databinding.
+
+  6. GESTION DES ERREURS : centralisée, AUCUN try/catch dispersé dans les pages.
+     - Niveau HTTP (Program.cs, hors développement) :
+       app.UseExceptionHandler("/Error", createScopeForErrors: true);
+       + une page Components/Pages/Error.razor (message neutre, sans détails techniques).
+     - Niveau composant : un <ErrorBoundary> GLOBAL dans MainLayout.razor autour de @Body.
+       Le <ErrorContent> affiche un MudAlert ; les détails (Message/StackTrace) ne sont
+       montrés QUE si IWebHostEnvironment.IsDevelopment().
+       Réarmement OBLIGATOIRE : appeler _errorBoundary.Recover() sur
+       NavigationManager.LocationChanged (sinon l'écran d'erreur reste affiché après
+       navigation), avec désabonnement dans Dispose().
+     - Erreurs ATTENDUES (validation, introuvable) : gérées dans le Service (retour de
+       résultat) + Snackbar MudBlazor, PAS via l'ErrorBoundary.
+
+  7. MULTILANGUE (FR / EN / ES) : aucun texte en dur dans les pages.
+     - Mécanisme standard .NET : IStringLocalizer + fichiers .resx + cookie de langue.
+     - Une seule classe marqueur SharedResource.cs + un fichier par langue :
+       Resources/SharedResource.resx (FR = défaut/repli), .en.resx, .es.resx.
+     - Program.cs : builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+       app.UseRequestLocalization(SetDefaultCulture("fr") + cultures fr/en/es);
+       app.MapGet("/Culture/Set", ...) qui écrit un cookie .AspNetCore.Culture puis
+       fait un LocalRedirect (rechargement complet obligatoire en Blazor Server).
+     - Dans les pages : @inject IStringLocalizer<SharedResource> L puis @L["Ma.Cle"].
+     - Sélecteur FR | EN | ES dans le header (liens <a href> vers /Culture/Set),
+       langue active surlignée ; <html lang="..."> dynamique dans App.razor.
+     - FR rempli ; si une clé manque en EN/ES, le FR s'affiche en repli.
+
+  9. AUTHENTIFICATION (Cookie natif, PAS Identity) :
+     - Utiliser AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme) + AddCookie — PAS ASP.NET Core Identity (trop lourd).
+     - Un service AuthService vérifie les identifiants (email + hash bcrypt).
+     - Un service UserService gère le CRUD utilisateur (créer, lire, modifier mot de passe).
+     - Les claims (id, email, rôle) sont ajoutés dans le cookie par un endpoint /auth/login dans Program.cs.
+     - Le rôle pilote les restrictions [Authorize(Roles="...")] dans les pages.
+     - La table utilisateur est gérée manuellement (pas de tables Identity auto-générées).
+       Le nom de la table est fixé par [Table("...")] sur le model, le DbSet par convention (ex: Users).
+
+  10. À la fin : build + lance l'app et vérifie qu'elle répond (HTTP 200).

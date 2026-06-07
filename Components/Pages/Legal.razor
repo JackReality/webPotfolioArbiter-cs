@@ -1,0 +1,68 @@
+@page "/legal"
+@inject IStringLocalizer<SharedResource> L
+
+<PageTitle>@L["Legal.Title"]</PageTitle>
+
+<div class="pa-page">
+    <MudText Typo="Typo.h3" GutterBottom="true">@L["Legal.Title"]</MudText>
+    <MudText Class="mb-6" Style="opacity:.8;">@L["Legal.Intro"]</MudText>
+
+    <MudTabs Rounded="true" ApplyEffectsToContainer="true">
+        @* ----- Onglet 1 : Conditions générales (9 articles) ----- *@
+        <MudTabPanel Text="@L["Legal.Tab.Cgv"]">
+            <MudText Typo="Typo.h5" GutterBottom="true">@L["Legal.Cgv.Heading"]</MudText>
+            @RenderArticles("Legal.Cgv", 9)
+        </MudTabPanel>
+
+        @* ----- Onglet 2 : Confidentialité (7 articles) ----- *@
+        <MudTabPanel Text="@L["Legal.Tab.Privacy"]">
+            <MudText Typo="Typo.h5" GutterBottom="true">@L["Legal.Privacy.Heading"]</MudText>
+            <MudText Class="mb-6" Style="opacity:.85;">@L["Legal.Privacy.Intro"]</MudText>
+            @RenderArticles("Legal.Privacy", 7)
+        </MudTabPanel>
+
+        @* ----- Onglet 3 : Mentions légales (4 articles + contact) ----- *@
+        <MudTabPanel Text="@L["Legal.Tab.Mentions"]">
+            <MudText Typo="Typo.h5" GutterBottom="true">@L["Legal.Mentions.Heading"]</MudText>
+            @RenderArticles("Legal.Mentions", 4)
+
+            @* Article 5 : Contact — l'email n'est PAS dans le HTML, révélé au clic *@
+            <div class="mb-6">
+                <MudText Typo="Typo.subtitle1"><strong>@L["Legal.Mentions.S5.Title"]</strong></MudText>
+                @if (_showEmail)
+                {
+                    <MudLink Href="@($"mailto:{Email}")">@Email</MudLink>
+                }
+                else
+                {
+                    <MudButton Variant="Variant.Outlined" Size="Size.Small" Class="mt-2"
+                               OnClick="@(() => _showEmail = true)">
+                        @L["Legal.Mentions.ShowEmail"]
+                    </MudButton>
+                }
+            </div>
+        </MudTabPanel>
+    </MudTabs>
+</div>
+
+@code {
+    // --- Email anti-robots : stocké en deux morceaux, jamais en clair dans le HTML.
+    // Il n'est reconstruit et affiché qu'APRÈS le clic (_showEmail = true).
+    private bool _showEmail;
+    private const string EmailUser = "contact";
+    private const string EmailDomain = "realityexplorer.com";
+    private string Email => $"{EmailUser}@{EmailDomain}";
+
+    // Affiche N articles "Titre + Corps" pour un préfixe de clés donné.
+    // @foreach sur une plage = variable fraîche à chaque tour (évite le bug
+    // de capture où toutes les lignes affichaient la dernière valeur).
+    private RenderFragment RenderArticles(string prefix, int count) => @<text>
+        @foreach (var n in Enumerable.Range(1, count))
+        {
+            <div class="mb-6">
+                <MudText Typo="Typo.subtitle1"><strong>@L[$"{prefix}.S{n}.Title"]</strong></MudText>
+                <MudText Class="pa-body" Style="opacity:.85;">@L[$"{prefix}.S{n}.Body"]</MudText>
+            </div>
+        }
+    </text>;
+}

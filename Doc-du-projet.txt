@@ -1,0 +1,286 @@
+============================================================
+DOC PERSO - GESTION DES ERREURS CENTRALISEE (Blazor Server)
+============================================================
+
+INTRODUCTION
+------------
+Ce document est un guide pédagogique destiné aux débutants en C# qui connaissent bien un autre langage de programmation.
+Il explique les concepts fondamentaux de la programmation C# dans le contexte de ce projet Blazor Web App.
+Les notions de base comme les classes, les méthodes, les propriétés, l'injection de dépendances, les interfaces, etc. seront introduites progressivement tout en expliquant comment ils s'appliquent à ce projet spécifique.
+
+PRINCIPE
+--------
+Deux filets de sécurité complémentaires, et AUCUN try/catch disperse dans les pages.
+- Le filet HTTP attrape ce qui casse pendant la requête.
+- L'ErrorBoundary attrape ce qui casse pendant l'interactivité (clics, chargements de page).
+Les erreurs ATTENDUES (formulaire invalide, "introuvable") ne passent PAS par ces filets :
+on les gère dans le Service + un message Snackbar MudBlazor.
+
+
+------------------------------------------------------------
+FICHIER 1 : Program.cs  (déjà fourni par le gabarit Blazor)
+------------------------------------------------------------
+
+  app.UseExceptionHandler("/Error", createScopeForErrors: true);
+    -> Filet niveau HTTP. Une exception non gérée pendant la requête redirige
+       vers la page /Error. "createScopeForErrors" = périmètre d'injection propre
+       pour gérer l'erreur. Actif HORS développement seulement.
+
+  app.UseStatusCodePagesWithReExecute("/not-found", ...);
+    -> Les codes HTTP type 404 réaffichent la page /not-found.
+
+
+------------------------------------------------------------
+FICHIER 2 : Components/Layout/MainLayout.razor  (ajouté)
+------------------------------------------------------------
+
+  <ErrorBoundary @ref="_errorBoundary">
+    -> Filet niveau composant. Attrape une exception d'une page et GARDE LE CIRCUIT
+       BLAZOR VIVANT (la connexion ne se coupe pas) au lieu d'un écran blanc.
+       @ref = référence pour pouvoir le réarmer ensuite.
+
+  <ChildContent> ... @Body ... </ChildContent>
+    -> Le contenu NORMAL de la page.
+
+  <ErrorContent Context="ex"> ... </ErrorContent>
+    -> Ce qui s'affiche EN CAS D'ERREUR. "ex" = l'exception attrapée.
+
+  @if (Env.IsDevelopment()) { ... @ex.Message @ex.StackTrace ... }
+    -> Les détails techniques ne sont montrés QU'EN DÉVELOPPEMENT.
+       En production : message neutre seulement (pas de fuite d'informations sensibles).
+       Env est injecté via : @inject IWebHostEnvironment Env
+
+  _errorBoundary.Recover();
+    -> REARME la frontière. Sans ça, l'écran d'erreur resterait affiché même
+       après avoir navigué vers une autre page.
+
+  Nav.LocationChanged += OnLocationChanged;  (dans OnInitialized)
+  Nav.LocationChanged -= OnLocationChanged;  (dans Dispose)
+    -> On s'abonne au changement de page pour appeler Recover() à chaque navigation,
+       et on se DÉSABONNE dans Dispose() pour éviter les fuites mémoire.
+       Nav est injecté via : @inject NavigationManager Nav
+
+
+------------------------------------------------------------
+REGLE D'OR
+------------------------------------------------------------
+ErrorBoundary  = pour l'IMPREVU (bug, MySQL injoignable...).
+Service + Snackbar = pour l'ATTENDU (validation, introuvable...).
+Sinon, le moindre champ mal rempli afficherait l'écran rouge "erreur technique".
+
+
+============================================================
+MULTILANGUE (FR / EN / ES)
+============================================================
+
+PRINCIPE
+--------
+Aucun texte "en dur" dans les pages. Chaque texte a une CLE (ex: "Nav.Accueil")
+et sa traduction vit dans des fichiers .resx, un par langue. La langue par defaut
+et le repli est le FRANCAIS : si une cle n'est pas traduite en EN ou ES, le texte
+francais s'affiche automatiquement.
+
+Mecanisme standard .NET : IStringLocalizer + fichiers .resx + cookie de langue.
+
+
+OU SE TROUVENT LES TEXTES
+-------------------------
+  SharedResource.cs
+    -> Classe VIDE qui sert de point d'ancrage (un seul endroit pour TOUTES
+       les traductions, plus simple qu'un fichier par page).
+
+  Resources/SharedResource.resx       -> FRANCAIS (langue par defaut + repli)
+  Resources/SharedResource.en.resx    -> ANGLAIS  (a remplir)
+  Resources/SharedResource.es.resx    -> ESPAGNOL (a remplir)
+
+  Une entree = <data name="MaCle"><value>Mon texte</value></data>
+  Pour traduire : recopier le meme "name" dans le .en.resx / .es.resx et changer
+  le <value>. Les paragraphes longs gardent leurs sauts de ligne (xml:space="preserve").
+
+
+COMMENT AFFICHER UN TEXTE DANS UNE PAGE
+---------------------------------------
+  @inject IStringLocalizer<SharedResource> L      (en haut du .razor)
+  ...
+  <h1>@L["Home.Hero.Title"]</h1>                  (dans le markup)
+
+  -> L["cle"] renvoie le texte dans la langue courante (ou le francais en repli).
+
+
+CHANGER DE LANGUE (le selecteur FR | EN | ES du header)
+-------------------------------------------------------
+  Program.cs :
+    builder.Services.AddLocalization(o => o.ResourcesPath = "Resources");
+      -> active IStringLocalizer et indique le dossier des .resx.
+
+    app.UseRequestLocalization(... SetDefaultCulture("fr") + cultures fr/en/es);
+      -> a chaque requete, fixe la langue courante d'apres le COOKIE de langue.
+
+    app.MapGet("/Culture/Set", ...);
+      -> endpoint appele par le selecteur : il ecrit la langue dans un cookie
+         (.AspNetCore.Culture) puis RECHARGE la page (LocalRedirect).
+         Le rechargement complet est NECESSAIRE en Blazor Server pour que le
+         circuit reparte dans la bonne langue.
+
+  MainLayout.razor :
+    - liens <a href="/Culture/Set?culture=xx&redirectUri=..."> (vrai rechargement,
+      pas une navigation SPA).
+    - la langue active est surlignee en bordeaux.
+
+  App.razor :
+    <html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
+      -> l'attribut lang du HTML suit la langue choisie (bon pour le SEO).
+
+
+REGLE D'OR
+----------
+Jamais de texte ecrit en dur dans une page : toujours une cle + @L["..."].
+Le francais est la reference ; EN et ES se remplissent au fur et a mesure.
+
+
+============================================================
+ACCES AUX DONNEES - COMMENT ÇA FONCTIONNE
+============================================================
+
+PRINCIPE GENERAL
+----------------
+Dans ce projet Blazor Web App, l'accès aux données se fait via Entity Framework Core (EF Core) avec un fournisseur MySQL (Pomelo).
+L'architecture suit un pattern de séparation stricte entre les couches :
+- Les pages (.razor) ne manipulent pas directement les données
+- Les services (dans le dossier Services/) sont responsables de la logique métier et de l'accès aux données
+- Le DbContext (AppDbContext) est le point d'entrée pour interagir avec la base de données
+
+STRUCTURE DES ENTITES
+---------------------
+Chaque entité (table de la base de données) correspond à une classe dans le dossier Models/ :
+- Exemple : la table "users" correspond à la classe User dans Models/User.cs
+- Ces classes héritent de la classe base EntityBase ou sont annotées avec [Table("nom_table")]
+
+SERVICES ET ACCESS LAYER
+------------------------
+Pour chaque entité, il existe un service correspondant dans le dossier Services/ :
+- Exemple : ClientService pour la classe Client
+- Les services reçoivent le DbContext via injection de dépendance dans leur constructeur
+- Les pages utilisent ces services pour accéder aux données (await service.GetClientsAsync())
+- Les opérations de lecture/écriture sont encapsulées dans les méthodes des services
+
+ACCES AU CONTEXT DB
+-------------------
+1. AppDbContext.cs : Contient les DbSet<T> pour chaque entité
+   - Exemple : public DbSet<User> Users { get; set; }
+
+2. Injection de dépendance dans Program.cs :
+   - builder.Services.AddDbContext<AppDbContext>(options => ...)
+   - Cela permet aux services de recevoir un DbContext via leur constructeur
+
+3. Utilisation dans les services :
+   - Le service reçoit le DbContext via son constructeur
+   - Les méthodes du service utilisent les DbSet pour effectuer les requêtes LINQ
+   - Exemple : await _context.Users.FindAsync(id);
+
+4. Sauvegarde des modifications :
+   - Les modifications sont effectuées dans les services
+   - L'appel à SaveChangesAsync() est fait dans les services
+   - Cela garantit que toutes les modifications sont sauvegardées correctement
+
+FLUX DE DONNEES
+---------------
+1. Une page demande des données via un service (await service.GetXxxAsync())
+2. Le service utilise le DbContext pour récupérer les données via LINQ
+3. Les données sont retournées à la page
+4. Si une modification est nécessaire, la page appelle un service d'update
+5. Le service effectue les modifications sur le DbContext
+6. Le service appelle SaveChangesAsync() pour persister les données
+7. La page reçoit la confirmation de succès ou d'erreur
+
+EXEMPLE CONCRET
+---------------
+Dans le projet, pour récupérer tous les utilisateurs :
+1. Une page appelle : await userService.GetAllUsersAsync()
+2. UserService implémente cette méthode en utilisant : await _context.Users.ToListAsync()
+3. Les données sont retournées à la page
+4. Pour ajouter un utilisateur :
+   1. La page appelle : await userService.AddUserAsync(user)
+   2. UserService :
+      - _context.Users.Add(user)
+      - await _context.SaveChangesAsync()
+   3. La page reçoit la confirmation de réussite
+
+REGLE D'OR
+----------
+- Les pages n'ont jamais accès directement au DbContext
+- Les services sont la seule couche qui interagit avec le DbContext
+- Les opérations de base de données sont toujours effectuées dans les services
+- Les modifications doivent être sauvegardées explicitement via SaveChangesAsync()
+
+
+============================================================
+AUTHENTIFICATION & ACCES (3 niveaux)
+============================================================
+
+QUEL TYPE D'AUTH ?
+------------------
+On utilise le mecanisme OFFICIEL de Microsoft : l'authentification par
+COOKIE d'ASP.NET Core (natif, eprouve). On ne prend PAS ASP.NET Core Identity
+(la grosse surcouche qui imposerait ses propres tables).
+La seule partie "maison" = verifier le mot de passe contre NOTRE table users
+avec bcrypt. Resume : moteur officiel + notre magasin d'utilisateurs.
+
+COMMENT CA MARCHE
+-----------------
+Au login, ASP.NET Core cree un COOKIE chiffre contenant l'identite (id, email,
+role). A chaque requete, .NET le lit et reconstruit "User", dispo partout via
+AuthenticationState. C'est ca la "session" de connexion (rien a coder nous-memes).
+
+LES 3 NIVEAUX D'ACCES (pilotes par la colonne "role" de la table users)
+-----------------------------------------------------------------------
+  PUBLIC  : aucun attribut. Accessible a tous.
+  LOGGED  : @attribute [Authorize]                       -> il faut etre connecte.
+  CLIENT  : @attribute [Authorize(Roles = "client,admin")] -> a paye (admin inclus).
+
+Roles possibles : visitor, subscriber, client, admin.
+Ces attributs se mettent EN HAUT de la page .razor, sur leur propre ligne.
+
+LE FLUX (qui fait quoi)
+-----------------------
+  Program.cs :
+    AddAuthentication(Cookie).AddCookie(o => {
+        o.LoginPath = "/login";          -> pas connecte : redirige ici
+        o.AccessDeniedPath = "/acces-reserve"; -> connecte mais mauvais role
+    });
+    AddAuthorization(); AddCascadingAuthenticationState();
+    app.UseAuthentication(); app.UseAuthorization();  (avant UseAntiforgery)
+
+    Endpoint POST /auth/login  : verifie le mot de passe (AuthService) puis
+      SignInAsync(...) pose le cookie avec le role en "claim". (Besoin du
+      HttpContext -> c'est un endpoint, pas un bouton interactif.)
+    Endpoint POST /auth/logout : SignOutAsync(...) efface le cookie.
+
+  Routes.razor :
+    AuthorizeRouteView (au lieu de RouteView) fait respecter les [Authorize].
+    <NotAuthorized> : si pas connecte -> RedirectToLogin ; sinon -> AccesReserve.
+
+  Models/User.cs : mappe sur la table "users" existante ([Table]/[Column]),
+    AUCUNE migration (on ne recree pas la base).
+  Services/AuthService.cs : VerifierIdentifiantsAsync(email, mdp) -> BCrypt.Verify.
+
+  Pages : Login (formulaire qui POSTE vers /auth/login, jeton antiforgery +
+    data-enhance="false" pour un vrai rechargement), AccesReserve (/acces-reserve),
+    EspaceClient (exemple [Authorize(Roles=...)]).
+  Header (MainLayout) : <AuthorizeView> -> "Connexion" si anonyme, sinon nom +
+    bouton "Deconnexion" (form POST /auth/logout).
+
+POINTS IMPORTANTS
+-----------------
+- Mot de passe : TOUJOURS hache en bcrypt ($2a$...), jamais en clair. Lib BCrypt.Net-Next.
+- Le [Authorize] est applique au niveau HTTP (endpoint) : la redirection 401->/login
+  et 403->/acces-reserve est automatique. /acces-reserve DOIT etre une vraie page routee.
+- "client a paye" = role 'client' pour l'instant ; plus tard, le paiement passera
+  le role a 'client' (ou une table achats).
+- Connexion MySQL : DB_HOST=127.0.0.1 (le user 'portfolio' n'est PAS autorise
+  pour 'localhost').
+
+REGLE D'OR
+----------
+Pas de mot de passe en clair. Une page = un niveau declare par son attribut.
+Le role en base est la seule source de verite pour l'acces.

@@ -1,0 +1,44 @@
+@page "/login"
+@inject IStringLocalizer<SharedResource> L
+
+<PageTitle>@L["Login.Title"]</PageTitle>
+
+<div class="pa-page" style="max-width:460px;">
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">@L["Login.Title"]</MudText>
+        <MudText Class="mb-4" Style="opacity:.8;">@L["Auth.LoginSubtitle"]</MudText>
+
+        @if (ErrorFlag == 1)
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-4">@L["Auth.Error"]</MudAlert>
+        }
+
+        @* Formulaire HTML classique qui POSTE vers l'endpoint /auth/login.
+           - AntiforgeryToken : jeton anti-CSRF (sécurité, exigé par .NET).
+           - data-enhance="false" : vrai POST + rechargement (pour poser le cookie). *@
+        <form method="post" action="/auth/login" data-enhance="false">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="@ReturnUrl" />
+
+            <label class="pa-field-label">@L["Auth.Email"]</label>
+            <input class="pa-input" type="email" name="email" required autocomplete="username" />
+
+            <label class="pa-field-label">@L["Auth.Password"]</label>
+            <input class="pa-input" type="password" name="password" required autocomplete="current-password" />
+
+            <button class="pa-submit" type="submit">@L["Auth.SignIn"]</button>
+        </form>
+
+        <div class="mt-4" style="display:flex; justify-content:space-between; gap:12px;">
+            <MudLink Href="/reset">@L["Auth.ForgotPassword"]</MudLink>
+            <MudLink Href="/register">@L["Auth.CreateAccount"]</MudLink>
+        </div>
+    </MudPaper>
+</div>
+
+@code {
+    // Récupérés depuis l'URL : ?returnUrl=... (page à rejoindre après login)
+    // et ?error=1 (échec de connexion).
+    [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
+    [SupplyParameterFromQuery(Name = "error")] public int? ErrorFlag { get; set; }
+}

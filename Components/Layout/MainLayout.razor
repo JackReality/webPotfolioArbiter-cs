@@ -1,0 +1,148 @@
+@inherits LayoutComponentBase
+@using System.Globalization
+@inject NavigationManager Nav
+@inject IWebHostEnvironment Env
+@inject IStringLocalizer<SharedResource> L
+@implements IDisposable
+
+<!-- Thème : fond noir, accent bordeaux #9d1f45, toujours en mode sombre -->
+<MudThemeProvider Theme="_theme" IsDarkMode="true" />
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout>
+    <!-- ===================== EN-TÊTE (sur toutes les pages) ===================== -->
+    <MudAppBar Elevation="0" Style="background:#000;" Dense="false">
+        <MudLink Href="/">
+            <img src="images/logo-white.png" alt="@L["Site.Name"]" class="pa-logo" />
+        </MudLink>
+
+        <MudSpacer />
+
+        <nav class="d-none d-md-flex">
+            <a href="/" class="pa-navlink @Active("")">@L["Nav.Accueil"]</a>
+            <a href="/telecharger" class="pa-navlink @Active("telecharger")">@L["Nav.Telecharger"]</a>
+            <a href="/formation" class="pa-navlink @Active("formation")">@L["Nav.Formation"]</a>
+        </nav>
+
+        <MudSpacer />
+
+        <div class="pa-lang me-4">
+            @* data-enhance-nav="false" => vrai rechargement, indispensable pour
+               que le changement de langue s'applique à tout le site. *@
+            <a href="@CultureHref("fr")" data-enhance-nav="false" class="@LangActive("fr")">FR</a>
+            <span class="sep">|</span>
+            <a href="@CultureHref("en")" data-enhance-nav="false" class="@LangActive("en")">EN</a>
+            <span class="sep">|</span>
+            <a href="@CultureHref("es")" data-enhance-nav="false" class="@LangActive("es")">ES</a>
+        </div>
+        <AuthorizeView>
+            <Authorized>
+                <span class="pa-navlink">@context.User.Identity?.Name</span>
+                <form method="post" action="/auth/logout" data-enhance="false" style="display:inline;">
+                    <AntiforgeryToken />
+                    <button type="submit" class="pa-navlink"
+                            style="background:none; border:none; cursor:pointer; font:inherit;">
+                        @L["Nav.Logout"]
+                    </button>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <a href="/login" class="pa-navlink">@L["Nav.Connexion"]</a>
+            </NotAuthorized>
+        </AuthorizeView>
+    </MudAppBar>
+
+    <!-- ===================== CONTENU + FRONTIÈRE D'ERREUR ===================== -->
+    <MudMainContent>
+        <ErrorBoundary @ref="_errorBoundary">
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="ex">
+                <MudAlert Severity="Severity.Error" Variant="Variant.Filled" Class="ma-4">
+                    <strong>Une erreur technique est survenue.</strong>
+                    Nous avons été notifiés. Réessayez ou revenez à l'accueil.
+                </MudAlert>
+                @if (Env.IsDevelopment())   // détails affichés UNIQUEMENT en développement
+                {
+                    <pre style="background:#eedddd; color:#000; padding:10px; font-size:12px; overflow:auto;">
+@ex.Message
+
+@ex.StackTrace
+                    </pre>
+                }
+            </ErrorContent>
+        </ErrorBoundary>
+
+        <!-- ===================== PIED DE PAGE (sur toutes les pages) ===================== -->
+        <footer class="pa-footer">
+            <div class="pa-footer__inner">
+                <div class="pa-footer__left">
+                    <img src="images/logo-white.png" alt="@L["Site.Name"]" class="pa-logo" style="opacity:.9;" />
+                    <div>
+                        <p style="margin:0 0 12px;">© 2026 @L["Site.Name"]. @L["Footer.Rights"]</p>
+                        <a href="/legal">@L["Footer.Legal"]</a>
+                    </div>
+                </div>
+                <a href="https://www.youtube.com/@@portfolioarbiter" target="_blank" rel="noopener noreferrer"
+                   aria-label="YouTube" class="pa-youtube">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17"></path>
+                        <path d="m10 15 5-3-5-3z"></path>
+                    </svg>
+                </a>
+            </div>
+        </footer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private ErrorBoundary? _errorBoundary;
+
+    // Thème MudBlazor : palette sombre + couleur primaire bordeaux.
+    private readonly MudTheme _theme = new()
+    {
+        PaletteDark = new PaletteDark()
+        {
+            Primary = "#9d1f45",
+            Black = "#000000",
+            Background = "#0a0a0a",
+            Surface = "#141414",
+            AppbarBackground = "#000000",
+            AppbarText = "#ffffff",
+            DrawerBackground = "#000000",
+            TextPrimary = "#ffffff"
+        }
+    };
+
+    protected override void OnInitialized()
+        => Nav.LocationChanged += OnLocationChanged;
+
+    // Désactive l'erreur si elle existe lors de changement de la page
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+        => _errorBoundary?.Recover();
+
+    public void Dispose() => Nav.LocationChanged -= OnLocationChanged;
+
+    // --- Aides pour le menu et le sélecteur de langue ---
+
+    // Classe "active" si on est sur la page donnée (chemin relatif).
+    private string Active(string relativePath)
+        => string.Equals(Nav.ToBaseRelativePath(Nav.Uri).Split('?')[0].TrimEnd('/'),
+                          relativePath, StringComparison.OrdinalIgnoreCase)
+           ? "active" : "";
+
+    // Classe "active" pour la langue actuellement affichée.
+    private string LangActive(string culture)
+        => CultureInfo.CurrentUICulture.TwoLetterISOLanguageName == culture ? "active" : "";
+
+    // Construit le lien qui change la langue puis revient sur la page courante.
+    private string CultureHref(string culture)
+    {
+        var redirect = "/" + Nav.ToBaseRelativePath(Nav.Uri);
+        return $"/Culture/Set?culture={culture}&redirectUri={Uri.EscapeDataString(redirect)}";
+    }
+}

@@ -2,6 +2,35 @@
 DOC PERSO - GESTION DES ERREURS CENTRALISEE (Blazor Server)
 ============================================================
 
+SOMMAIRE
+--------
+  1. Gestion des erreurs centralisée
+     1.1 Filet HTTP (Program.cs)
+     1.2 ErrorBoundary (MainLayout.razor)
+     1.3 Règle d'or : imprévu vs attendu
+
+  2. Multilangue (FR / EN / ES)
+     2.1 Principe : IStringLocalizer + fichiers .resx
+     2.2 Où se trouvent les textes
+     2.3 Comment afficher un texte dans une page
+     2.4 Changer de langue (sélecteur + cookie)
+     2.5 Règle d'or
+
+  3. Accès aux données - Comment ça fonctionne
+     3.1 Principe général (Pages → Services → DbContext → Models)
+     3.2 Structure des entités (Models/)
+     3.3 Services et access layer (Services/)
+     3.4 Flux de données étape par étape
+     3.5 Exemple concret
+     3.6 Règle d'or
+
+  4. Authentification & Accès (3 niveaux)
+     4.1 Type d'auth : Cookie ASP.NET Core + bcrypt
+     4.2 Les 3 niveaux : PUBLIC / LOGGED / CLIENT
+     4.3 Le flux : qui fait quoi
+     4.4 Points importants
+     4.5 Règle d'or
+
 INTRODUCTION
 ------------
 Ce document est un guide pédagogique destiné aux débutants en C# qui connaissent bien un autre langage de programmation.

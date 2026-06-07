@@ -61,6 +61,9 @@ builder.Services.AddCascadingAuthenticationState();   // rend l'identité dispo 
 builder.Services.AddScoped<ExempleService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<EmailTemplateService>();
+builder.Services.AddScoped<TokenService>();
+builder.Services.AddScoped<EmailService>();
 
 var app = builder.Build();
 

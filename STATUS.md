@@ -41,6 +41,19 @@
 
 ---
 
+## ✅ Fait
+
+### Auth étape 2 : Changement de mot de passe et réinitialisation (Lot 1 terminé)
+- [x] Modèle `EmailToken` et `AppDbContext` configurés.
+- [x] `TokenService` créé pour générer, valider et supprimer les jetons de manière sécurisée (isolation des scopes Blazor via `IServiceScopeFactory`).
+- [x] **Page unique `ResetPassword.razor`** : gère à la fois le flux "Profil" (`/profil/changer-mdp`) et le flux "Oubli" (`/reset-password?token=...`). **Simplifié** : ne demande plus l'ancien mot de passe dans les deux cas, uniquement "Nouveau" et "Confirmation".
+- [x] Validation stricte avec composants **MudBlazor** (`MudForm`, `MudTextField`, `MudButton`) : affiche un message d'erreur clair si les mots de passe ne correspondent pas, **sans recharger la page**.
+- [x] `Reset.razor` implémentée pour demander l'email, générer le jeton et envoyer le lien via `EmailService`.
+- [x] `EmailService` (MailKit) configuré avec les variables `.env` (Infomaniak, port 465, `BASE_URL`, `MAIL_FROM`).
+- [x] Règle de processus ajoutée dans `QWEN.md` : vérification OBLIGATOIRE du "Build succeeded" avant tout test utilisateur.
+
+---
+
 ## 🤔 À réfléchir (décisions à figer)
 - [ ] **Fusionner `AuthService` + `UserService` ?** Aujourd'hui : `AuthService` = vérifier le
       mot de passe (connexion) ; `UserService` = gérer le compte (créer/modifier). Choix à trancher

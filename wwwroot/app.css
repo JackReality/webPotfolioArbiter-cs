@@ -174,9 +174,26 @@ h1:focus {
     border: 1px solid #444; background: #1e1e1e; color: #fff;
 }
 .pa-input:focus { outline: none; border-color: #9d1f45; }
+.pa-textarea {
+    width: 100%; box-sizing: border-box;
+    padding: 10px 12px; border-radius: 6px;
+    border: 1px solid #444; background: #1e1e1e; color: #fff;
+    font-family: 'Courier New', monospace; font-size: .9rem;
+    resize: vertical; line-height: 1.5;
+}
+.pa-textarea:focus { outline: none; border-color: #9d1f45; }
 .pa-submit {
     width: 100%; margin-top: 20px; padding: 11px;
     border: none; border-radius: 6px; cursor: pointer;
     background: #9d1f45; color: #fff; font-weight: 600;
 }
 .pa-submit:hover { background: #861a3a; }
+
+/* ===== Page Profil ===== */
+.pa-profile-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #9d1f45;
+}

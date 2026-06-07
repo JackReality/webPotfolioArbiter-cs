@@ -20,4 +20,10 @@ public class AppDbContext : DbContext
 
     // La table des utilisateurs (login, rôles).
     public DbSet<User> Users => Set<User>();
+
+    // Les templates d'emails (multilingues : 1 ligne = 1 type + 1 langue).
+    public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
+
+    // Les jetons temporaires (confirmation, réinitialisation de mot de passe).
+    public DbSet<EmailToken> EmailTokens => Set<EmailToken>();
 }

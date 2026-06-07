@@ -240,4 +240,32 @@ Switzerland</value></data>
   <data name="AccesReserve.Title" xml:space="preserve"><value>Restricted access</value></data>
   <data name="AccesReserve.Body" xml:space="preserve"><value>This page is reserved for clients who have purchased a course.</value></data>
   <data name="AccesReserve.Cta" xml:space="preserve"><value>View the course</value></data>
+
+  <!-- ===== Profile ===== -->
+  <data name="Profile.Title" xml:space="preserve"><value>My profile</value></data>
+  <data name="Profile.NotFound" xml:space="preserve"><value>User not found.</value></data>
+  <data name="Profile.Saved" xml:space="preserve"><value>Changes saved successfully.</value></data>
+  <data name="Profile.Avatar" xml:space="preserve"><value>Profile picture</value></data>
+  <data name="Profile.AvatarUrl" xml:space="preserve"><value>Photo URL</value></data>
+  <data name="Profile.DisplayName" xml:space="preserve"><value>Display name</value></data>
+  <data name="Profile.Language" xml:space="preserve"><value>Language</value></data>
+  <data name="Profile.Save" xml:space="preserve"><value>Save</value></data>
+  <data name="Profile.ChangePassword" xml:space="preserve"><value>Change password</value></data>
+
+  <!-- ===== Password change ===== -->
+  <data name="ChangePassword.Title" xml:space="preserve"><value>Change password</value></data>
+  <data name="ChangePassword.Subtitle" xml:space="preserve"><value>Enter your current password then choose a new one.</value></data>
+  <data name="ChangePassword.Saved" xml:space="preserve"><value>Password changed successfully.</value></data>
+  <data name="ChangePassword.CurrentPassword" xml:space="preserve"><value>Current password</value></data>
+  <data name="ChangePassword.NewPassword" xml:space="preserve"><value>New password</value></data>
+  <data name="ChangePassword.ConfirmPassword" xml:space="preserve"><value>Confirm new password</value></data>
+  <data name="ChangePassword.Submit" xml:space="preserve"><value>Change password</value></data>
+  <data name="ChangePassword.FillAll" xml:space="preserve"><value>Please fill in all fields.</value></data>
+  <data name="ChangePassword.Mismatch" xml:space="preserve"><value>The two new passwords do not match.</value></data>
+  <data name="ChangePassword.TooShort" xml:space="preserve"><value>Password must be at least 6 characters.</value></data>
+  <data name="ChangePassword.WrongCurrent" xml:space="preserve"><value>The current password is incorrect.</value></data>
+  <data name="ChangePassword.Error" xml:space="preserve"><value>Error changing password.</value></data>
+
+  <!-- ===== Common ===== -->
+  <data name="Common.Back" xml:space="preserve"><value>Back</value></data>
 </root>

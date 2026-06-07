@@ -1,0 +1,96 @@
+@page "/admin/email-templates"
+@inject IStringLocalizer<SharedResource> L
+@inject EmailTemplateService TemplateService
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Admin - Email Templates</PageTitle>
+
+<div class="pa-page" style="max-width:900px;">
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">Templates d'emails</MudText>
+
+        @if (!_isAdmin)
+        {
+            <MudAlert Severity="Severity.Warning">Accès réservé aux administrateurs.</MudAlert>
+        }
+        else if (_templates.Count == 0)
+        {
+            <MudProgressLinear Color="Color.Info" Indeterminate="true" />
+        }
+        else
+        {
+            @if (_success)
+            {
+                <MudAlert Severity="Severity.Success" Class="mb-4">Template sauvegardé.</MudAlert>
+            }
+
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+            }
+
+            @* ===== Onglets par type de mail ===== *@
+            <MudTabs Rounded="true" ApplyEffectsToContainer="true">
+                <MudTabPanel Text="Inscription">
+                    <LanguageTabs Templates="@_confirmTemplates" OnSave="SaveAsync" />
+                </MudTabPanel>
+                <MudTabPanel Text="Récupération MDP">
+                    <LanguageTabs Templates="@_recoveryTemplates" OnSave="SaveAsync" />
+                </MudTabPanel>
+                <MudTabPanel Text="Bienvenue">
+                    <LanguageTabs Templates="@_welcomeTemplates" OnSave="SaveAsync" />
+                </MudTabPanel>
+            </MudTabs>
+        }
+
+        <div class="mt-4">
+            <MudButton Href="/admin-dashboard"
+                       Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                Retour au Dashboard
+            </MudButton>
+        </div>
+    </MudPaper>
+</div>
+
+@code {
+    private bool _isAdmin;
+    private List<Models.EmailTemplate> _templates = new();
+    private List<Models.EmailTemplate> _confirmTemplates = new();
+    private List<Models.EmailTemplate> _recoveryTemplates = new();
+    private List<Models.EmailTemplate> _welcomeTemplates = new();
+    private bool _success;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var roleClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role);
+        _isAdmin = roleClaim?.Value == "admin";
+
+        if (_isAdmin)
+        {
+            _templates = await TemplateService.GetAllAsync();
+            _confirmTemplates = _templates.Where(t => t.Key == "confirm_signup").ToList();
+            _recoveryTemplates = _templates.Where(t => t.Key == "recovery").ToList();
+            _welcomeTemplates = _templates.Where(t => t.Key == "welcome").ToList();
+        }
+    }
+
+    private async Task SaveAsync(ulong id, string subject, string html)
+    {
+        _error = null;
+        _success = false;
+
+        try
+        {
+            await TemplateService.SaveAsync(id, subject, html);
+            _success = true;
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+}

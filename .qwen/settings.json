@@ -1,7 +1,24 @@
 {
   "permissions": {
     "allow": [
-      "Read(C:\\Users\\Jack\\.qwen/**)"
+      "Read(C:\\Users\\Jack\\.qwen/**)",
+      "Bash(dotnet *)",
+      "Bash(mkdir *)",
+      "Bash(taskkill *)",
+      "Bash(mysql *)",
+      "Bash(where *)",
+      "Bash(\"c:\\program files\\mariadb 11.8\\bin\\mysql.exe\" *)",
+      "Bash(c:\\progra~1\\mariadb~1\\bin\\mysql.exe *)",
+      "Bash(^\"\"c:\\program)",
+      "Bash(powershell *)",
+      "Bash(c:\\users\\jack\\documents\\vscode\\webportfolio-cs\\temp-db-check\\run.bat)",
+      "Bash(rd *)",
+      "Bash(del *)",
+      "Bash(findstr *)",
+      "Bash(rmdir *)",
+      "Bash(type *)",
+      "Bash(timeout *)",
+      "Bash(git add *)"
     ]
   },
   "$version": 4

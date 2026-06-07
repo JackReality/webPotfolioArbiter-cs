@@ -1,0 +1,116 @@
+@page "/profil"
+@attribute [Authorize]
+@inject IStringLocalizer<SharedResource> L
+@inject UserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Nav
+
+<PageTitle>@L["Profile.Title"]</PageTitle>
+
+<div class="pa-page" style="max-width:600px;">
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">@L["Profile.Title"]</MudText>
+
+        @if (_user is null)
+        {
+            <MudAlert Severity="Severity.Warning">@L["Profile.NotFound"]</MudAlert>
+        }
+        else if (_success)
+        {
+            <MudAlert Severity="Severity.Success" Class="mb-4">@L["Profile.Saved"]</MudAlert>
+        }
+
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+        }
+
+        @if (_user is not null)
+        {
+            <form>
+                @* ===== Avatar (picto par défaut — URL de photo à venir) ===== *@
+                <MudText Typo="Typo.subtitle1" Class="mb-2">@L["Profile.Avatar"]</MudText>
+                <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Style="font-size:64px; color:#888;" Class="mb-4" />
+
+                @* ===== Nom affiché ===== *@
+                <label class="pa-field-label">@L["Profile.DisplayName"]</label>
+                <input class="pa-input" @bind="_user.DisplayName" required />
+
+                @* ===== Email — lecture seule (confirmation mail requise pour le modifier) ===== *@
+                <label class="pa-field-label">@L["Auth.Email"]</label>
+                <MudText>@_user.Email</MudText>
+
+                @* ===== Langue ===== *@
+                <label class="pa-field-label">@L["Profile.Language"]</label>
+                <MudSelect T="string" @bind-Value="_user.Language" Label="@L["Profile.Language"]">
+                    <MudSelectItem Value="@("fr")">Français</MudSelectItem>
+                    <MudSelectItem Value="@("en")">English</MudSelectItem>
+                    <MudSelectItem Value="@("es")">Español</MudSelectItem>
+                </MudSelect>
+
+                @* ===== Boutons ===== *@
+                <div class="d-flex justify-space-between mt-6" style="gap:12px;">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAsync">
+                        @L["Profile.Save"]
+                    </MudButton>
+                    <MudButton Href="/profil/changer-mdp" Variant="Variant.Outlined" Color="Color.Secondary">
+                        @L["Profile.ChangePassword"]
+                    </MudButton>
+                </div>
+
+                @* ===== Bouton Admin (visible uniquement pour les admins) ===== *@
+                @if (_isAdmin)
+                {
+                    <MudDivider Class="mt-6 mb-4" />
+                    <MudButton Href="/admin-dashboard"
+                               Variant="Variant.Filled"
+                               Color="Color.Warning"
+                               FullWidth="true"
+                               EndIcon="@Icons.Material.Filled.Settings">
+                        Admin Dashboard
+                    </MudButton>
+                }
+            </form>
+        }
+    </MudPaper>
+</div>
+
+@code {
+    private Models.User? _user;
+    private bool _success;
+    private bool _isAdmin;
+    private string? _error;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var idClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (idClaim != null && ulong.TryParse(idClaim.Value, out var userId))
+        {
+            _user = await UserService.GetByIdAsync(userId);
+        }
+
+        var roleClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role);
+        _isAdmin = roleClaim?.Value == "admin";
+    }
+
+    private async Task SaveAsync()
+    {
+        if (_user is null) return;
+
+        _error = null;
+        _success = false;
+
+        try
+        {
+            // On ne sauvegarde QUE les champs modifiables ici.
+            // L'email est protégé (confirmation mail requise).
+            await UserService.SauvegarderProfilAsync(_user.Id, _user.DisplayName, _user.Language);
+            _success = true;
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+}

@@ -1,0 +1,41 @@
+@page "/admin-dashboard"
+@inject IStringLocalizer<SharedResource> L
+@inject NavigationManager Nav
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Admin - Dashboard</PageTitle>
+
+<div class="pa-page" style="max-width:600px;">
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">Admin Dashboard</MudText>
+
+        @if (!_isAdmin)
+        {
+            <MudAlert Severity="Severity.Warning">Accès réservé aux administrateurs.</MudAlert>
+        }
+        else
+        {
+            <MudText Class="mb-6">Gestion de l'administration du site.</MudText>
+
+            <MudButton Href="/admin/email-templates"
+                       Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       FullWidth="true"
+                       EndIcon="@Icons.Material.Filled.Email">
+                Modifier les templates d'emails
+            </MudButton>
+        }
+    </MudPaper>
+</div>
+
+@code {
+    private bool _isAdmin;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var roleClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role);
+        _isAdmin = roleClaim?.Value == "admin";
+    }
+}

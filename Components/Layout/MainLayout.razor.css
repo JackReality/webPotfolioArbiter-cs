@@ -96,3 +96,34 @@ main {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+/* ==================== Avatar utilisateur dans l'en-tête ==================== */
+.pa-user-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 0.75rem;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+.pa-avatar-icon {
+    font-size: 1.8rem;
+    color: #ffffff;
+    opacity: 0.85;
+    transition: opacity 0.2s;
+}
+
+.pa-avatar-img {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #9d1f45;
+}
+
+.pa-user-avatar:hover .pa-avatar-icon,
+.pa-user-avatar:hover .pa-avatar-img {
+    opacity: 1;
+    border-color: #c42d5a;
+}

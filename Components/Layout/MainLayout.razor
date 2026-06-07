@@ -1,8 +1,11 @@
 @inherits LayoutComponentBase
 @using System.Globalization
+@using System.Security.Claims
 @inject NavigationManager Nav
 @inject IWebHostEnvironment Env
 @inject IStringLocalizer<SharedResource> L
+@inject UserService UserService
+@inject AuthenticationStateProvider AuthStateProvider
 @implements IDisposable
 
 <!-- Thème : fond noir, accent bordeaux #9d1f45, toujours en mode sombre -->
@@ -38,8 +41,18 @@
             <a href="@CultureHref("es")" data-enhance-nav="false" class="@LangActive("es")">ES</a>
         </div>
         <AuthorizeView>
-            <Authorized>
-                <span class="pa-navlink">@context.User.Identity?.Name</span>
+            <Authorized Context="authContext">
+                @* Picto utilisateur : avatar si photo, icône par défaut sinon *@
+                <a href="/profil" class="pa-user-avatar" title="@L["Profile.Title"]">
+                    @if (!string.IsNullOrEmpty(_userAvatarUrl))
+                    {
+                        <img src="@_userAvatarUrl" alt="Avatar" class="pa-avatar-img" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Class="pa-avatar-icon" />
+                    }
+                </a>
                 <form method="post" action="/auth/logout" data-enhance="false" style="display:inline;">
                     <AntiforgeryToken />
                     <button type="submit" class="pa-navlink"
@@ -101,6 +114,27 @@
 
 @code {
     private ErrorBoundary? _errorBoundary;
+    private string? _userAvatarUrl;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Nav.LocationChanged += OnLocationChanged;
+        await LoadUserAvatarAsync();
+    }
+
+    /// <summary>Charge l'avatar de l'utilisateur connecté (via le cookie d'authentification).</summary>
+    private async Task LoadUserAvatarAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+        var idClaim = user.FindFirst(ClaimTypes.NameIdentifier);
+        if (idClaim != null && ulong.TryParse(idClaim.Value, out var userId))
+        {
+            var dbUser = await UserService.GetByIdAsync(userId);
+            _userAvatarUrl = dbUser?.AvatarUrl;
+            StateHasChanged();
+        }
+    }
 
     // Thème MudBlazor : palette sombre + couleur primaire bordeaux.
     private readonly MudTheme _theme = new()
@@ -117,9 +151,6 @@
             TextPrimary = "#ffffff"
         }
     };
-
-    protected override void OnInitialized()
-        => Nav.LocationChanged += OnLocationChanged;
 
     // Désactive l'erreur si elle existe lors de changement de la page
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)

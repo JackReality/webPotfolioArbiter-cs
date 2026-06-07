@@ -240,4 +240,32 @@ Suiza</value></data>
   <data name="AccesReserve.Title" xml:space="preserve"><value>Acceso restringido</value></data>
   <data name="AccesReserve.Body" xml:space="preserve"><value>Esta página está reservada a los clientes que han comprado una formación.</value></data>
   <data name="AccesReserve.Cta" xml:space="preserve"><value>Ver la formación</value></data>
+
+  <!-- ===== Perfil ===== -->
+  <data name="Profile.Title" xml:space="preserve"><value>Mi perfil</value></data>
+  <data name="Profile.NotFound" xml:space="preserve"><value>Usuario no encontrado.</value></data>
+  <data name="Profile.Saved" xml:space="preserve"><value>Cambios guardados correctamente.</value></data>
+  <data name="Profile.Avatar" xml:space="preserve"><value>Foto de perfil</value></data>
+  <data name="Profile.AvatarUrl" xml:space="preserve"><value>URL de la foto</value></data>
+  <data name="Profile.DisplayName" xml:space="preserve"><value>Nombre visible</value></data>
+  <data name="Profile.Language" xml:space="preserve"><value>Idioma</value></data>
+  <data name="Profile.Save" xml:space="preserve"><value>Guardar</value></data>
+  <data name="Profile.ChangePassword" xml:space="preserve"><value>Cambiar contraseña</value></data>
+
+  <!-- ===== Cambio de contraseña ===== -->
+  <data name="ChangePassword.Title" xml:space="preserve"><value>Cambiar contraseña</value></data>
+  <data name="ChangePassword.Subtitle" xml:space="preserve"><value>Ingrese su contraseña actual y elija una nueva.</value></data>
+  <data name="ChangePassword.Saved" xml:space="preserve"><value>Contraseña cambiada correctamente.</value></data>
+  <data name="ChangePassword.CurrentPassword" xml:space="preserve"><value>Contraseña actual</value></data>
+  <data name="ChangePassword.NewPassword" xml:space="preserve"><value>Nueva contraseña</value></data>
+  <data name="ChangePassword.ConfirmPassword" xml:space="preserve"><value>Confirmar nueva contraseña</value></data>
+  <data name="ChangePassword.Submit" xml:space="preserve"><value>Modificar contraseña</value></data>
+  <data name="ChangePassword.FillAll" xml:space="preserve"><value>Por favor complete todos los campos.</value></data>
+  <data name="ChangePassword.Mismatch" xml:space="preserve"><value>Las dos contraseñas nuevas no coinciden.</value></data>
+  <data name="ChangePassword.TooShort" xml:space="preserve"><value>La contraseña debe tener al menos 6 caracteres.</value></data>
+  <data name="ChangePassword.WrongCurrent" xml:space="preserve"><value>La contraseña actual es incorrecta.</value></data>
+  <data name="ChangePassword.Error" xml:space="preserve"><value>Error al modificar la contraseña.</value></data>
+
+  <!-- ===== Común ===== -->
+  <data name="Common.Back" xml:space="preserve"><value>Volver</value></data>
 </root>

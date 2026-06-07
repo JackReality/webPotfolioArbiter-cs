@@ -1,0 +1,46 @@
+@* Sous-composant : 3 sous-onglets langue (FR/EN/ES) avec éditeur subject + HTML *@
+
+<MudTabs Rounded="true" ApplyEffectsToContainer="true">
+    @foreach (var lang in _langs)
+    {
+        var template = Templates.FirstOrDefault(t => t.Lang == lang);
+        var langLabel = lang switch { "fr" => "Français", "en" => "English", _ => "Español" };
+        var localSubject = template?.Subject ?? "";
+        var localHtml = template?.Html ?? "";
+
+        <MudTabPanel Text="@langLabel">
+            @if (template is null)
+            {
+                <MudAlert Severity="Severity.Warning">Pas de template pour cette langue.</MudAlert>
+            }
+            else
+            {
+                <div class="mt-4">
+                    <label class="pa-field-label">Sujet</label>
+                    <input class="pa-input" @bind="localSubject" />
+
+                    <label class="pa-field-label mt-4">Contenu HTML</label>
+                    <textarea class="pa-textarea" rows="16" @bind="localHtml"></textarea>
+
+                    <div class="mt-4">
+                        <MudButton Variant="Variant.Filled"
+                                   Color="Color.Primary"
+                                   OnClick="() => OnSave(template.Id, localSubject, localHtml)">
+                            Sauvegarder
+                        </MudButton>
+                    </div>
+                </div>
+            }
+        </MudTabPanel>
+    }
+</MudTabs>
+
+@code {
+    [Parameter]
+    public List<Models.EmailTemplate> Templates { get; set; } = new();
+
+    [Parameter]
+    public Func<ulong, string, string, Task> OnSave { get; set; } = null!;
+
+    private readonly List<string> _langs = new() { "fr", "en", "es" };
+}

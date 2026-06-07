@@ -410,7 +410,43 @@ Suisse</value>
   <data name="Auth.Error" xml:space="preserve"><value>Email ou mot de passe incorrect.</value></data>
   <data name="Register.Title" xml:space="preserve"><value>Créer un compte</value></data>
   <data name="Reset.Title" xml:space="preserve"><value>Mot de passe oublié</value></data>
+  <data name="Reset.Subtitle" xml:space="preserve"><value>Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</value></data>
+  <data name="Reset.SuccessMessage" xml:space="preserve"><value>Si un compte est associé à cette adresse, vous recevrez un e-mail avec un lien de réinitialisation sous peu.</value></data>
+  <data name="Reset.Submit" xml:space="preserve"><value>Envoyer le lien</value></data>
+  <data name="Reset.EmailError" xml:space="preserve"><value>Une erreur est survenue lors de l'envoi de l'e-mail. Veuillez réessayer plus tard.</value></data>
+  <data name="Common.Sending" xml:space="preserve"><value>Envoi en cours...</value></data>
   <data name="AccesReserve.Title" xml:space="preserve"><value>Accès réservé</value></data>
   <data name="AccesReserve.Body" xml:space="preserve"><value>Cette page est réservée aux clients ayant acheté une formation.</value></data>
   <data name="AccesReserve.Cta" xml:space="preserve"><value>Voir la formation</value></data>
+
+  <!-- ===== Profil ===== -->
+  <data name="Profile.Title" xml:space="preserve"><value>Mon profil</value></data>
+  <data name="Profile.NotFound" xml:space="preserve"><value>Utilisateur introuvable.</value></data>
+  <data name="Profile.Saved" xml:space="preserve"><value>Modifications enregistrées avec succès.</value></data>
+  <data name="Profile.Avatar" xml:space="preserve"><value>Photo de profil</value></data>
+  <data name="Profile.AvatarUrl" xml:space="preserve"><value>URL de la photo</value></data>
+  <data name="Profile.DisplayName" xml:space="preserve"><value>Nom affiché</value></data>
+  <data name="Profile.Language" xml:space="preserve"><value>Langue</value></data>
+  <data name="Profile.Save" xml:space="preserve"><value>Enregistrer</value></data>
+  <data name="Profile.ChangePassword" xml:space="preserve"><value>Changer le mot de passe</value></data>
+
+  <!-- ===== Changement de mot de passe ===== -->
+  <data name="ChangePassword.Title" xml:space="preserve"><value>Changer le mot de passe</value></data>
+  <data name="ChangePassword.Subtitle" xml:space="preserve"><value>Entrez votre mot de passe actuel puis choisissez-en un nouveau.</value></data>
+  <data name="ChangePassword.Saved" xml:space="preserve"><value>Mot de passe modifié avec succès.</value></data>
+  <data name="ChangePassword.CurrentPassword" xml:space="preserve"><value>Mot de passe actuel</value></data>
+  <data name="ChangePassword.NewPassword" xml:space="preserve"><value>Nouveau mot de passe</value></data>
+  <data name="ChangePassword.ConfirmPassword" xml:space="preserve"><value>Confirmer le nouveau mot de passe</value></data>
+  <data name="ChangePassword.Submit" xml:space="preserve"><value>Modifier le mot de passe</value></data>
+  <data name="ChangePassword.FillAll" xml:space="preserve"><value>Veuillez remplir tous les champs.</value></data>
+  <data name="ChangePassword.Mismatch" xml:space="preserve"><value>Les deux nouveaux mots de passe ne correspondent pas.</value></data>
+  <data name="ChangePassword.TooShort" xml:space="preserve"><value>Le mot de passe doit contenir au moins 6 caractères.</value></data>
+  <data name="ChangePassword.WrongCurrent" xml:space="preserve"><value>Le mot de passe actuel est incorrect.</value></data>
+  <data name="ChangePassword.Error" xml:space="preserve"><value>Erreur lors de la modification du mot de passe.</value></data>
+  <data name="ChangePassword.RecoverySubtitle" xml:space="preserve"><value>Entrez votre nouveau mot de passe pour finaliser la réinitialisation.</value></data>
+  <data name="ChangePassword.InvalidOrExpiredToken" xml:space="preserve"><value>Le lien de réinitialisation est invalide ou a expiré.</value></data>
+
+  <!-- ===== Commun ===== -->
+  <data name="Common.Back" xml:space="preserve"><value>Retour</value></data>
+  <data name="Common.BackToLogin" xml:space="preserve"><value>Retour à la connexion</value></data>
 </root>

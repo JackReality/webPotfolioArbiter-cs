@@ -1,5 +1,7 @@
 @page "/login"
 @inject IStringLocalizer<SharedResource> L
+@inject AuthService Auth
+@inject Microsoft.JSInterop.IJSRuntime JS
 
 <PageTitle>@L["Login.Title"]</PageTitle>
 
@@ -8,29 +10,33 @@
         <MudText Typo="Typo.h4" GutterBottom="true">@L["Login.Title"]</MudText>
         <MudText Class="mb-4" Style="opacity:.8;">@L["Auth.LoginSubtitle"]</MudText>
 
-        @if (ErrorFlag == 1)
+        @* L'erreur s'affiche ICI, sur place, sans recharger la page (_error rempli
+           par la validation interactive). ErrorFlag = repli si l'endpoint redirige. *@
+        @if (!string.IsNullOrEmpty(_error) || ErrorFlag == 1)
         {
             <MudAlert Severity="Severity.Error" Class="mb-4">@L["Auth.Error"]</MudAlert>
         }
 
-        @* Formulaire HTML classique qui POSTE vers l'endpoint /auth/login.
-           - AntiforgeryToken : jeton anti-CSRF (sécurité, exigé par .NET).
-           - data-enhance="false" : vrai POST + rechargement (pour poser le cookie). *@
-        <form method="post" action="/auth/login" data-enhance="false">
+        @* Le formulaire POSTE vers /auth/login (vrai POST nécessaire pour poser le
+           cookie d'auth). Mais le bouton est type="button" : au clic on valide
+           D'ABORD en C# (SubmitAsync) ; on ne déclenche le POST que si les
+           identifiants sont bons. data-enhance="false" : vrai POST sans interception.
+           AntiforgeryToken : jeton anti-CSRF exigé par .NET. *@
+        <form method="post" action="/auth/login" data-enhance="false" id="login-form">
             <AntiforgeryToken />
             <input type="hidden" name="returnUrl" value="@ReturnUrl" />
 
             <label class="pa-field-label">@L["Auth.Email"]</label>
-            <input class="pa-input" type="email" name="email" required autocomplete="username" />
+            <input class="pa-input" type="email" name="email" id="login-email" required autocomplete="username" />
 
             <label class="pa-field-label">@L["Auth.Password"]</label>
-            <input class="pa-input" type="password" name="password" required autocomplete="current-password" />
+            <input class="pa-input" type="password" name="password" id="login-password" required autocomplete="current-password" />
 
-            <button class="pa-submit" type="submit">@L["Auth.SignIn"]</button>
+            <button class="pa-submit" type="button" @onclick="SubmitAsync">@L["Auth.SignIn"]</button>
         </form>
 
         <div class="mt-4" style="display:flex; justify-content:space-between; gap:12px;">
-            <MudLink Href="/reset">@L["Auth.ForgotPassword"]</MudLink>
+            <MudLink Href="/forgot-password">@L["Auth.ForgotPassword"]</MudLink>
             <MudLink Href="/register">@L["Auth.CreateAccount"]</MudLink>
         </div>
     </MudPaper>
@@ -38,7 +44,32 @@
 
 @code {
     // Récupérés depuis l'URL : ?returnUrl=... (page à rejoindre après login)
-    // et ?error=1 (échec de connexion).
+    // et ?error=1 (repli : si l'endpoint redirige malgré tout).
     [SupplyParameterFromQuery] public string? ReturnUrl { get; set; }
     [SupplyParameterFromQuery(Name = "error")] public int? ErrorFlag { get; set; }
+
+    private string? _error;
+
+    private async Task SubmitAsync()
+    {
+        _error = null;
+
+        // On lit la valeur RÉELLE des champs dans le DOM (robuste à l'autofill du
+        // navigateur, qui ne déclenche pas toujours les événements de binding).
+        var email = await JS.InvokeAsync<string>("getInputValue", "login-email");
+        var password = await JS.InvokeAsync<string>("getInputValue", "login-password");
+
+        // Validation interactive AVANT tout POST : si les identifiants sont mauvais,
+        // on se contente d'afficher l'erreur (aucun rechargement / redirection).
+        var user = await Auth.VerifierIdentifiantsAsync(email ?? "", password ?? "");
+        if (user is null)
+        {
+            _error = L["Auth.Error"];
+            return;
+        }
+
+        // Identifiants valides → on poste réellement le formulaire pour que
+        // l'endpoint /auth/login pose le cookie d'authentification (HttpContext requis).
+        await JS.InvokeVoidAsync("submitForm", "login-form");
+    }
 }

@@ -27,6 +27,35 @@ public class UserService
         return await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
     }
 
+    /// <summary>Lecture : TOUS les utilisateurs, du plus récent au plus ancien.</summary>
+    public async Task<List<User>> GetAllAsync()
+    {
+        return await _db.Users
+            .OrderByDescending(u => u.CreatedAt)
+            .ToListAsync();
+    }
+
+    /// <summary>
+    /// Écriture : SUPPRIME un utilisateur.
+    /// Sécurité : on REFUSE de supprimer un compte ayant le rôle "admin".
+    /// Grâce à la clé étrangère "ON DELETE CASCADE", supprimer l'utilisateur
+    /// efface aussi automatiquement ses jetons (table email_tokens).
+    /// Renvoie false si l'utilisateur est introuvable.
+    /// </summary>
+    public async Task<bool> SupprimerAsync(ulong id)
+    {
+        var user = await _db.Users.FindAsync(id);
+        if (user is null)
+            return false;
+
+        if (user.Role == "admin")
+            throw new InvalidOperationException("Impossible de supprimer un administrateur.");
+
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
     /// <summary>Lecture : retrouve un utilisateur par son email (null si introuvable).</summary>
     public async Task<User?> GetByEmailAsync(string email)
     {
@@ -58,22 +87,12 @@ public class UserService
     /// </summary>
     public async Task<bool> ChangerMotDePasseAsync(ulong id, string nouveauMotDePasse)
     {
-        System.Console.WriteLine($"[DEBUG UserService] Début ChangerMotDePasseAsync pour ID: {id}");
-        
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
         if (user is null)
-        {
-            System.Console.WriteLine($"[DEBUG UserService] ERREUR CRITIQUE: Utilisateur ID {id} introuvable en base.");
             return false;
-        }
-        
-        System.Console.WriteLine($"[DEBUG UserService] Utilisateur trouvé: {user.Email}. Application du nouveau hash...");
+
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(nouveauMotDePasse);
-        
-        System.Console.WriteLine($"[DEBUG UserService] Appel de SaveChangesAsync...");
         var rowsAffected = await _db.SaveChangesAsync();
-        
-        System.Console.WriteLine($"[DEBUG UserService] Résultat SaveChangesAsync: {rowsAffected} ligne(s) affectée(s).");
         return rowsAffected > 0;
     }
 

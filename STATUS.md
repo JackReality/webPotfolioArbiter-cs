@@ -1,111 +1,142 @@
 # État du projet — Portfolio Arbiter
 
-> Site de vente de formations (Blazor Server .NET 10 · MudBlazor · MySQL/Pomelo).
-> Ce fichier suit l'avancement. Dernière mise à jour : 2026-06-06.
+> **Règle de structure de ce fichier** : 7 chapitres maximum.
+> 1. "À faire"
+> 2 à 7. "Fait le [YYYY-MM-DD]" (le plus ancien est supprimé quand un nouveau est ajouté).
 
 ---
 
-## ✅ Fait
+## 1. À faire
 
-### Socle & conventions
-- Architecture Blazor Server, projet unique, MudBlazor, EF Core + Pomelo (MySQL).
-- **Gestion d'erreurs centralisée** : `UseExceptionHandler("/Error")` + `<ErrorBoundary>` global dans `MainLayout` (voir `Doc-du-projet.txt`).
-- Secrets dans `.env` (DotNetEnv). ⚠️ **`DB_HOST=127.0.0.1`** obligatoire (le user MySQL `portfolio` refuse `localhost`). Base = `portfolio_arbiter`.
+### 🆕 Lot « Contact + page Training » (demandé le 2026-06-08)
+- [ ] **Formulaire de contact** : page/section avec champs (nom, email, message) qui **envoie la demande à `contact@realityexplorer.com`** via `EmailService` (MailKit, déjà configuré). Prévoir : validation des champs, message de succès, et gestion d'erreur silencieuse (log serveur). *(à décider : route dédiée `/contact` ou bloc réutilisable.)*
+- [ ] **Page Training** (`/training`, `Training.razor`) : afficher la **liste des formations dans la langue du site** (`TrainingService.GetByLanguageAsync(CurrentUICulture)`, comme `Catalog.razor`). **Si aucune formation** : message type « Pas de formation pour le moment, mais envoyez-nous une demande et nous serons ravis d'y répondre » + lien vers le **formulaire de contact** (lié à la tâche ci-dessus). ⚠️ **À clarifier** : `Catalog.razor` (`/catalog`) fait déjà cette liste filtrée par langue → fusionner les deux pages, ou `/training` remplace `/catalog` ?
 
-### Multilingue (FR / EN / ES)
-- `IStringLocalizer<SharedResource>` + `.resx` (FR par défaut/repli, EN + ES remplis).
-- Sélecteur de langue dans le header (cookie + rechargement), `<html lang>` dynamique.
-- **Traduit** : page d'accueil, page légale, menu, pied de page.
+### 🟢 Lot « Achat (Stripe) » — squelette, 1 sous-étape à la fois
 
-### Pages
-- **Accueil** (`/`) : 6 sections façon maquette (hero + position + stratégie + transactions + rendement + arbitrage).
-- **Légal** (`/legal`) : 3 onglets — CGV (9 art.), Confidentialité (7 art.), Mentions (5 art.). Email de contact anti-robots (révélé au clic, `contact@realityexplorer.com`).
-- Pages vierges : `Telecharger`, `Formation`, `Login`, `Register`, `Reset`, `EspaceClient`, `AccesReserve`.
+> Décisions actées : **squelette seulement** (clés en placeholders dans `.env`, à remplir
+> plus tard) ; montée en rôle `subscriber → client` par **vérification au retour** sur
+> `/stripe-ok` (le serveur interroge Stripe pour confirmer le paiement). Un `admin` reste `admin`.
+> ⚠️ Non testable tant que les vraies clés Stripe ne sont pas dans `.env`.
 
-### Authentification & accès (3 niveaux) — étape 1
-- Auth par **cookie officiel ASP.NET Core** sur la table `users` (bcrypt via BCrypt.Net-Next).
-- 3 niveaux par attribut : public / `[Authorize]` / `[Authorize(Roles="client,admin")]`.
-- Endpoints `/auth/login` et `/auth/logout`. Header dynamique (Connexion ↔ nom + Déconnexion).
-- **Testé OK** : login, mauvais mot de passe rejeté, redirection des pages protégées, accès réservé client.
-- Compte de test : `facebook@grillet.ch` / `Test1234!` (subscriber) · `jack@grillet.ch` (admin).
+- [ ] **Étape 1 — Préparer le terrain.** Package `Stripe.net` (`.csproj`) + placeholders `STRIPE_SECRET_KEY` dans `.env` + `StripeService` (création d'une session Stripe Checkout à partir de `training.StripePriceId`, `success_url`=`/stripe-ok?session_id=...`, `cancel_url`=`/stripe-error`). *(rien de visible encore)*
+- [ ] **Étape 2 — Brancher le bouton « Acheter »** du catalogue : si non connecté → `/login` ; sinon créer la session et rediriger vers l'URL Stripe (`NavigateTo(url, forceLoad:true)`).
+- [ ] **Étape 3 — Pages de retour** : `/stripe-ok` (vérifie via Stripe que la session est payée, puis monte le rôle `subscriber → client`) et `/stripe-error` (paiement annulé/échoué).
+- [ ] **Étape 4 — Email de confirmation** après achat, via `training.ConfirmationEmailHtml` (envoyé par `EmailService`).
 
-### Gestion des utilisateurs (CRUD) — étape 1
-- **`Services/UserService.cs` créé** (enregistré dans `Program.cs` via `AddScoped`). Méthodes :
-  `GetByIdAsync`, `GetByEmailAsync`, `CreerAsync` (hache bcrypt + `Add` + `SaveChanges`),
-  `ChangerMotDePasseAsync`. ⚠️ Pas encore branché à une page → à utiliser dans `/register` et `/reset`.
-- Rappel archi (la « recette en 4 gestes » pour CHAQUE table) :
-  1. Model dans `Models/` (1 classe = 1 table, ex. `User`).
-  2. `DbSet<T>` dans `AppDbContext` (nom au pluriel = la table, ex. `Users`).
-  3. Service dans `Services/` (la logique, reçoit le `DbContext` par injection).
-  4. `builder.Services.AddScoped<XxxService>()` dans `Program.cs` (sinon `@inject` impossible).
-
----
-
-## ✅ Fait
-
-### Auth étape 2 : Changement de mot de passe et réinitialisation (Lot 1 terminé)
-- [x] Modèle `EmailToken` et `AppDbContext` configurés.
-- [x] `TokenService` créé pour générer, valider et supprimer les jetons de manière sécurisée (isolation des scopes Blazor via `IServiceScopeFactory`).
-- [x] **Page unique `ResetPassword.razor`** : gère à la fois le flux "Profil" (`/profil/changer-mdp`) et le flux "Oubli" (`/reset-password?token=...`). **Simplifié** : ne demande plus l'ancien mot de passe dans les deux cas, uniquement "Nouveau" et "Confirmation".
-- [x] Validation stricte avec composants **MudBlazor** (`MudForm`, `MudTextField`, `MudButton`) : affiche un message d'erreur clair si les mots de passe ne correspondent pas, **sans recharger la page**.
-- [x] `Reset.razor` implémentée pour demander l'email, générer le jeton et envoyer le lien via `EmailService`.
-- [x] `EmailService` (MailKit) configuré avec les variables `.env` (Infomaniak, port 465, `BASE_URL`, `MAIL_FROM`).
-- [x] Règle de processus ajoutée dans `QWEN.md` : vérification OBLIGATOIRE du "Build succeeded" avant tout test utilisateur.
-
----
-
-## 🤔 À réfléchir (décisions à figer)
-- [ ] **Fusionner `AuthService` + `UserService` ?** Aujourd'hui : `AuthService` = vérifier le
-      mot de passe (connexion) ; `UserService` = gérer le compte (créer/modifier). Choix à trancher
-      quand le rôle de chaque objet sera bien digéré.
-- [ ] **Préfixe `ft` sur les tables ?** Décision : NE PAS préfixer les classes C# (`User`, `Client`…).
-      Si une table porte un préfixe (cas du projet en prod), le mettre UNIQUEMENT dans
-      `[Table("ftUser")]` — la classe C# reste propre. À appliquer si on reprend cette base.
-- [ ] **Documenter la « recette en 4 gestes » dans `CLAUDE.md`** comme convention officielle.
-
----
-
-## 🔜 À faire
-
-### ##Git local et sur github
-
-### Notifier si erreur
-- Créer un code global mailErrorSend() et l'intégrer dans erreur program.cs et mainlayout
-
-### Ajouter dans Jack-PromptInitProjet 
-- Ajouter la demande intégrer le login selon ce qui est fait actuellement
-
-### Auth — étape 2 (prioritaire)
-- [ ] **Inscription** (`/register`) : formulaire + création user (bcrypt) + email de confirmation
-      via `email_templates` (FR/EN/ES) et jeton dans `email_tokens` (purpose `confirm`).
-- [ ] **Mot de passe oublié** (`/reset`) : demande email → jeton `recovery` → page nouveau mot de passe.
-- [ ] **Envoi d'emails** : service SMTP (Infomaniak ?) qui lit `email_templates` selon type + langue.
+### 🔵 Auth — étape 2 (prioritaire)
+- [ ] **Inscription** (`/register`) : formulaire + création user (bcrypt) + email de confirmation via `email_templates` (FR/EN/ES) et jeton dans `email_tokens` (purpose `confirm`).
 - [ ] Bloquer la connexion si `email_confirmed = 0` (au choix).
-- [ ] Page **profil** (`/profile`) : changer pseudo, langue, photo, mot de passe.
+- [ ] Page **profil** (`/profile`) : il reste la **photo** (changement pseudo/langue/mot de passe déjà faits).
 
-### Contenu des pages
-- [ ] **Télécharger** : bouton de copie de la Google Sheet (accès selon rôle).
-- [ ] **Formation** : présentation + achat (passe le rôle à `client`).
-- [ ] **Espace client** : contenu réservé aux clients.
-- [ ] Traduire EN/ES le contenu de ces pages quand il existera (tout est dans les `jack-import/*.json`).
+### 🔧 Revue — restes à corriger
+- [ ] `EmailService` : remplacer `SecureSocketOptions.Auto` par un mapping explicite (`465 → SslOnConnect`, `587 → StartTls`). *(actuellement `Auto` — choix volontairement gardé, voir Fait 06-08)*
+- [ ] `TokenService` : pas de nettoyage des jetons expirés ; une nouvelle demande n'invalide pas les précédents (plusieurs liens valides en parallèle).
+- [ ] `Profile` : après sauvegarde du pseudo, le claim `Name` du cookie reste périmé jusqu'à reconnexion (nom du header non rafraîchi).
 
-### Métier (cœur du site)
-- [ ] **Achat de formation** → paiement (Stripe ?) → passage du rôle à `client`.
+### 📄 Contenu des pages
+- [ ] **Download** (`/download`) : bouton de copie de la Google Sheet (accès selon rôle).
+- [ ] **Training** (`/training`) : présentation + achat (passe le rôle à `client`).
+- [ ] **Client area** (`/client-area`) : contenu réservé aux clients.
+
+### 🏗️ Métier (cœur du site)
+- [ ] **Achat de formation** → paiement (Stripe) → passage du rôle à `client`. *(voir lot Stripe)*
 - [ ] **Forum** des visiteurs/clients.
 
-### Admin (présent dans les JSON, pas encore implémenté)
-- [ ] Gestion des utilisateurs (liste, rôles).
-- [ ] Éditeur des `email_templates` (FR/EN/ES).
+### 🛠️ Admin
+- [ ] **Modifier une formation** (`/admin/trainings`, `AdminTraining.razor`) : aujourd'hui on peut lister / ajouter / supprimer, mais **pas éditer**. Ajouter l'édition d'une formation existante (titre, langue, description HTML, Stripe IDs, email de confirmation) → `TrainingService.UpdateAsync`.
+- [ ] Gestion des rôles utilisateurs (la **liste + suppression** est faite, voir Fait 06-08).
+- [ ] Éditeur des `email_templates` (FR/EN/ES) — *partiellement fait, à finaliser*.
 
-### Divers
+### 🔩 Divers & Technique
+- [ ] **Notifier si erreur** : créer un code global `mailErrorSend()` et l'intégrer dans `Program.cs` (gestion d'erreur) et `MainLayout`.
+- [ ] **Jack-PromptInitProjet** : ajouter la demande d'intégrer le login selon ce qui est fait actuellement.
 - [ ] Décider du sort de la table `schema_migrations` (laissée pour l'instant, supprimable).
 - [ ] Remplir l'email de contact réel dans les Mentions (actuellement `contact@realityexplorer.com`).
-- [ ] Avant prod : revoir les CGV/mentions par un juriste ; ne pas exposer les détails d'erreur (déjà géré : seulement en Development).
 
 ---
 
-## 🔑 Rappels techniques
-- Lancer : `dotnet run` → http://localhost:5252 (https://localhost:7178).
-- Base : `127.0.0.1:13306`, db `portfolio_arbiter`, user `portfolio`.
-- Tables : `users`, `email_templates`, `email_tokens`, `schema_migrations`.
-- Pas de migration EF : les entités sont mappées sur les tables existantes (`[Table]`/`[Column]`).
+## 2. Fait le 2026-06-08
+
+### Doc & conventions (tout en anglais)
+- [x] **Doc remaniée.** `CLAUDE.md` 180→66 l. + annexes `ARCHITECTURE.md`, `AUTH.md`, `I18N.md` ; accès CLI DB + schéma dans `database.md` (ex-`BASE_DE_DONNEES.md`) ; workflow détaillé dans `PROCESSUS_TRAVAIL.md`. Convention (tout en anglais, colonne `language`) + règle `watch` gravées. Convention de nommage des pages documentée dans `database.md`.
+
+### Renommage anglais : table, pages, clés i18n
+- [x] **Table `trainings`** (ex-`formations`) + colonne `language` : modèle `Training`, `TrainingService` (`GetByLanguageAsync`), `DbSet Trainings`, route `/admin/trainings`, sélecteur de langue dans l'admin + colonne « Langue », **catalogue filtré sur la langue courante**.
+- [x] **`email_templates.lang` → `language`** (DB + `EmailTemplate.Language` + `EmailTemplateService` + `LanguageTabs.razor`).
+- [x] **Routes + fichiers `.razor` en anglais** : `/profil`→`/profile`, `/telecharger`→`/download` (`Download.razor`), `/formation`→`/training` (`Training.razor`), `/catalogue`→`/catalog`, `/espace-client`→`/client-area` (`ClientArea.razor`), `/acces-reserve`→`/access-denied` (`AccessDenied.razor`), `/reset`→`/forgot-password` (`ForgotPassword.razor`). Répercuté partout (`Program.cs`, `MainLayout`, `Routes.razor`, liens). **Vérifié** : nouvelles routes 302/200, anciennes 404.
+- [x] **Clés i18n en anglais** (3 `.resx` + usages) : `Nav.Home/Download/Training/Login`, `Download.Title`, `Training.Title`, `AccessDenied.*`, `ForgotPassword.*`, `Legal.Terms.*`/`Legal.Tab.Terms`, `Legal.LegalNotice.*`/`Legal.Tab.LegalNotice`, + nouvelle clé `ClientArea.Title` (titre auparavant en dur). Valeurs/traductions inchangées → zéro impact visuel.
+
+### Langue, login, mot de passe
+- [x] **Langue au login** : `/auth/login` pose le cookie de langue depuis `user.Language`.
+- [x] **Sélecteur FR/EN/ES fiable** : clic intercepté (`@onclick:preventDefault` + `SetCulture` → `NavigateTo(url, forceLoad:true)`) → changement systématique.
+- [x] **Page mot de passe : une seule route** `/reset-password` (2ᵉ route retirée ; lien profil re-pointé).
+- [x] **Bouton « Admin Dashboard »** du profil : déjà en `Color.Warning` (ambre), visible admins seulement. Conservé.
+- [x] **Login : erreur sans rechargement.** Validation C# d'abord (`AuthService`) ; mauvais identifiants → message sur place ; bons identifiants → vrai POST (JS `submitForm`) pour poser le cookie.
+
+### Admin, utilisateurs, catalogue
+- [x] **`/admin/users`** (`AdminUsers.razor`) : liste (email, nom, rôle, langue, date) + **Supprimer** (sauf admin, côté UI + serveur). Bouton ajouté au dashboard.
+- [x] **Cascade de suppression user vérifiée** : seule FK `email_tokens.user_id → users.id` en `ON DELETE CASCADE` → suppression propre. `email_templates`/`trainings` globaux. Doc : `database.md`.
+- [x] **`/admin/trainings`** (`AdminTraining.razor`) : liste + ajout + suppression.
+- [x] **`/catalog`** (`Catalog.razor`, publique) : formations (titre + HTML) séparées par `MudDivider`, boutons « Acheter » (message « Stripe à configurer »).
+
+### Revue du commit `c30d584` (corrections)
+- [x] Templates d'emails admin branchés sur le mail réel (`ForgotPassword.razor` lit le template `recovery`, repli FR + repli HTML minimal).
+- [x] Pages admin protégées par `@attribute [Authorize(Roles = "admin")]`.
+- [x] Bug `LanguageTabs` (texte qui revenait) : `@bind` direct sur l'objet en mémoire.
+- [x] Erreur SMTP brute **non révélée** à l'utilisateur (loggée serveur, succès générique anti-énumération).
+- [x] `Console.WriteLine` de debug retirés (`UserService.ChangerMotDePasseAsync`).
+- [x] Langue du profil appliquée (option A : `/Culture/Set` + forceLoad, message via `?saved=1`).
+- [x] `AdminEmailTemplates` : spinner infini si table vide corrigé (flag `_loaded`).
+- ~~`EmailService` : `Auto` → mapping SSL explicite.~~ **Abandonné** : le port vient du `.env` et `Auto` choisit le bon mode → adapté. *(une variante « mapping explicite » reste listée en À faire, optionnelle.)*
+
+### Auth étape 2 : Changement de mot de passe et réinitialisation
+- [x] Modèle `EmailToken` et `AppDbContext` configurés.
+- [x] `TokenService` (générer / valider / supprimer les jetons ; isolation des scopes Blazor via `IServiceScopeFactory`).
+- [x] Page unique `ResetPassword.razor` (flux « Profil » + « Oubli »), simplifiée (ne demande plus l'ancien mot de passe).
+- [x] Validation stricte (MudBlazor `MudForm`/`MudTextField`/`MudButton`).
+- [x] `ForgotPassword.razor` : demande l'email, génère le jeton, envoie le lien via `EmailService`.
+- [x] `EmailService` (MailKit) configuré avec `.env` (Infomaniak, port 465, `BASE_URL`, `MAIL_FROM`).
+
+---
+
+## 3. Fait le 2026-06-07
+
+### Authentification & accès (étape 1)
+- [x] Auth par cookie officiel ASP.NET Core sur la table `users` (bcrypt via BCrypt.Net-Next).
+- [x] 3 niveaux par attribut : public / `[Authorize]` / `[Authorize(Roles="client,admin")]`.
+- [x] Endpoints `/auth/login` et `/auth/logout`. Header dynamique.
+- [x] Compte de test : `facebook@grillet.ch` / `Test1234!` (subscriber) · `jack@grillet.ch` (admin).
+
+### Gestion des utilisateurs (CRUD)
+- [x] `Services/UserService.cs` créé et enregistré dans `Program.cs`.
+- [x] Méthodes : `GetByIdAsync`, `GetByEmailAsync`, `CreerAsync` (hache bcrypt), `ChangerMotDePasseAsync`, `SauvegarderProfilAsync`.
+
+---
+
+## 4. Fait le 2026-06-06
+
+### Socle & conventions
+- [x] Architecture Blazor Server, projet unique, MudBlazor, EF Core + Pomelo (MySQL).
+- [x] Gestion d'erreurs centralisée : `UseExceptionHandler("/Error")` + `<ErrorBoundary>` global dans `MainLayout`.
+- [x] Secrets dans `.env` (DotNetEnv). `DB_HOST=127.0.0.1` obligatoire. Base = `portfolio_arbiter`.
+
+### Multilingue (FR / EN / ES)
+- [x] `IStringLocalizer<SharedResource>` + `.resx` (FR par défaut/repli, EN + ES remplis).
+- [x] Sélecteur de langue dans le header (cookie + rechargement), `<html lang>` dynamique.
+
+### Pages de base
+- [x] Accueil (`/`) : 6 sections façon maquette.
+- [x] Légal (`/legal`) : 3 onglets (CGV, Confidentialité, Mentions). Email de contact anti-robots.
+- [x] Pages vierges créées (depuis renommées en anglais — voir Fait 06-08).
+
+---
+
+## 5. Fait le [À venir]
+*(Aucun historique supplémentaire pour le moment)*
+
+## 6. Fait le [À venir]
+*(Aucun historique supplémentaire pour le moment)*
+
+## 7. Fait le [À venir]
+*(Aucun historique supplémentaire pour le moment)*

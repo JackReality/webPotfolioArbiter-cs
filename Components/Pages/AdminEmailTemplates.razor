@@ -1,8 +1,8 @@
 @page "/admin/email-templates"
+@attribute [Authorize(Roles = "admin")]
 @inject IStringLocalizer<SharedResource> L
 @inject EmailTemplateService TemplateService
 @inject NavigationManager Nav
-@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Admin - Email Templates</PageTitle>
 
@@ -10,13 +10,13 @@
     <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
         <MudText Typo="Typo.h4" GutterBottom="true">Templates d'emails</MudText>
 
-        @if (!_isAdmin)
+        @if (!_loaded)
         {
-            <MudAlert Severity="Severity.Warning">Accès réservé aux administrateurs.</MudAlert>
+            <MudProgressLinear Color="Color.Info" Indeterminate="true" />
         }
         else if (_templates.Count == 0)
         {
-            <MudProgressLinear Color="Color.Info" Indeterminate="true" />
+            <MudAlert Severity="Severity.Warning">Aucun template trouvé en base.</MudAlert>
         }
         else
         {
@@ -55,7 +55,7 @@
 </div>
 
 @code {
-    private bool _isAdmin;
+    private bool _loaded;
     private List<Models.EmailTemplate> _templates = new();
     private List<Models.EmailTemplate> _confirmTemplates = new();
     private List<Models.EmailTemplate> _recoveryTemplates = new();
@@ -65,17 +65,12 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var roleClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role);
-        _isAdmin = roleClaim?.Value == "admin";
-
-        if (_isAdmin)
-        {
-            _templates = await TemplateService.GetAllAsync();
-            _confirmTemplates = _templates.Where(t => t.Key == "confirm_signup").ToList();
-            _recoveryTemplates = _templates.Where(t => t.Key == "recovery").ToList();
-            _welcomeTemplates = _templates.Where(t => t.Key == "welcome").ToList();
-        }
+        // L'accès admin est garanti par [Authorize(Roles = "admin")] sur la page.
+        _templates = await TemplateService.GetAllAsync();
+        _confirmTemplates = _templates.Where(t => t.Key == "confirm_signup").ToList();
+        _recoveryTemplates = _templates.Where(t => t.Key == "recovery").ToList();
+        _welcomeTemplates = _templates.Where(t => t.Key == "welcome").ToList();
+        _loaded = true;
     }
 
     private async Task SaveAsync(ulong id, string subject, string html)

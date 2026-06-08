@@ -1,117 +1,66 @@
-# Projet Portfolio
+# Projet Portfolio Arbiter
 
-> Dossier : `webPortfolio-C#` · Projet C# : `Portfolio` (le nom diffère car `#` est
-> interdit dans un nom de projet .NET). L'utilisateur **débute en C#** — expliquer
-> simplement, répondre **en français**.
+> Dossier `webPortfolio-cs` · projet C# `Portfolio` (`#` est interdit dans un nom .NET).
+> L'utilisateur **débute en C#** → expliquer simplement, **répondre en français**.
 
-## But du projet
+## But
+Site de **vente de formations en ligne** : forum, achat de formations, 3 espaces
+(**public** / **connecté** / **client**).
+**État** : ✅ socle d'architecture, auth cookie + rôles, multilingue FR/EN/ES.
+⏳ le métier (forum, achat, contenu des formations) n'est pas encore fait.
 
-Site web de **vente de formations en ligne**, avec :
-- un **forum** pour les visiteurs,
-- l'**achat** de formations,
-- trois espaces : **public** (anonyme), **connecté**, et **client** (a acheté une formation).
+## Stack
+- **Blazor Web App** (.NET 10), rendu **serveur** (`InteractiveServer`), **pas** de WebAssembly.
+- UI **MudBlazor** · DB **MySQL** (EF Core + provider **Pomelo**) · Auth **cookie natif** (pas Identity), mots de passe **bcrypt**.
+- i18n **.NET** (`IStringLocalizer` + `.resx`) FR/EN/ES · secrets dans **`.env`** (DotNetEnv, ignoré par Git).
 
-⚠️ **État actuel.**
-- ✅ **Fait** : socle d'architecture, **authentification** (connexion/déconnexion par
-  cookie), **autorisation par rôles**, **multilingue FR/EN/ES**. Les trois espaces
-  (public / connecté / client) sont déjà protégés par `[Authorize]`.
-- ⏳ **Pas encore** : le **métier** (forum, achat, contenu réel des formations). Les
-  pages protégées affichent pour l'instant un simple « bientôt disponible ».
+## ⚠️ Règles non négociables (à lire AVANT de coder)
+1. **Tout le code/identifiants en anglais** : fichiers, routes, classes, services,
+   **tables + colonnes SQL**, propriétés, variables. SQL en `snake_case`, C# en `PascalCase`.
+   **Colonne de langue = `language`** partout. (Les textes affichés passent par l'i18n ;
+   la doc et nos échanges restent en français.)
+2. **`DB_HOST=127.0.0.1`** obligatoire (le user MySQL `portfolio` refuse `localhost`).
+3. **Pas de migrations EF** : on **crée les tables en SQL à la main**, puis on mappe le modèle
+   (`[Table]`/`[Column]`). La table `users` est gérée à la main.
+4. **Pages en fichier unique** (`.razor` : markup en haut + bloc `@code` en bas, pas de code-behind).
+5. **Logique dans `Services/`** (injectés par constructeur) ; une page n'appelle **jamais** le `DbContext`.
+6. **MudBlazor d'abord** pour les composants.
+→ détail des conventions de codage : [`ARCHITECTURE.md`](ARCHITECTURE.md).
 
-## Stack technique
+## Mode de travail (boucle à respecter)
+1. L'utilisateur donne un **objectif**. 2. Je **propose les tâches** (sans coder).
+3. Il valide → j'ajoute dans **`STATUS.md`**. 4. J'exécute **UNE tâche à la fois**, je vérifie
+la compilation, puis **je m'arrête et je fais le point** ; je ne continue qu'après son **feu vert**.
+→ règles de suivi détaillées : [`PROCESSUS_TRAVAIL.md`](PROCESSUS_TRAVAIL.md).
 
-| Élément | Choix |
-|---|---|
-| Framework | **Blazor Web App** (.NET 10), **rendu serveur** (`InteractiveServer`) |
-| WebAssembly | **Non** (choix délibéré : accès direct à la base, bon SEO, plus simple) |
-| UI | **MudBlazor** (bibliothèque de composants) |
-| Base de données | **MySQL** via EF Core + provider **Pomelo** |
-| Authentification | **cookie natif .NET** (pas d'Identity), mots de passe hachés **bcrypt** |
-| Multilingue | **localisation .NET** (`IStringLocalizer` + fichiers `.resx`) : FR / EN / ES |
-| Secrets | fichier **`.env`** (chargé par **DotNetEnv**), ignoré par Git |
-
-## Architecture — un seul projet, à plat
-
-```
-webPortfolio-C#/
-├── .env                  # identifiants MySQL (NE JAMAIS committer)
-├── Program.cs            # démarrage : .env, MySQL, MudBlazor, AUTH (cookie), i18n, endpoints /auth/*
-├── Models/               # 1 classe = 1 table (ex. User → table "users")
-├── Data/                 # AppDbContext (le pont vers MySQL ; DbSet<User>)
-├── Services/             # logique métier, injectée dans les pages (ex. AuthService)
-├── Resources/            # fichiers .resx (traductions FR / EN / ES)
-├── SharedResource.cs     # classe "marqueur" qui référence les .resx pour IStringLocalizer
-└── Components/
-    ├── App.razor         # page hôte (styles/scripts MudBlazor + mode interactif)
-    ├── Routes.razor      # routeur : AuthorizeRouteView (fait respecter les [Authorize])
-    ├── RedirectToLogin.razor  # redirige un visiteur non connecté vers /login
-    ├── Layout/           # MainLayout (providers MudBlazor, barre, menu) + NavMenu
-    └── Pages/            # les pages .razor (Login, Register, Reset, AccesReserve, …)
-```
-
-**Sens des dépendances :** `Pages → Services → Data → Models`. Les `Models` ne
-dépendent de rien.
-
-## Conventions de codage (à respecter)
-
-1. **Pages en fichier unique** : pas de code-behind `.cs` séparé. Le markup
-   (HTML / MudBlazor) en haut, le C# dans un bloc **`@code`** en bas du même `.razor`.
-2. **Une classe par table** dans `Models/`. Une nouvelle table = un `DbSet<T>`
-   ajouté dans `AppDbContext`.
-3. **Logique dans `Services/`**, jamais dans les pages. Le service reçoit le
-   `DbContext` par **injection de constructeur** ; les pages appellent le service
-   (`@inject MonService`), jamais le `DbContext` directement.
-4. **Databinding** : `@bind-Value` lie un champ à une variable (temps réel,
-   automatique). L'**enregistrement en base n'est PAS automatique** : il se fait
-   sur action (clic bouton → `await service.XxxAsync()` → `SaveChangesAsync()`).
-5. **MudBlazor d'abord** pour les composants (tables triables, formulaires,
-   dialogues…). HTML/CSS classique possible en complément.
+## Serveur de dev (`dotnet watch`)
+- **C'est Claude qui tient `dotnet watch`** en arrière-plan : il **recompile et rafraîchit le
+  navigateur tout seul** à chaque sauvegarde. Claude **lit ses logs** pour confirmer `Build succeeded`
+  (plus besoin d'un build manuel séparé).
+- ⚠️ Le hot-reload n'applique **pas** les changements structurels (nouvelle **route `@page`**,
+  nouveau fichier) → après ce type de modif, **Claude redémarre le `watch`**.
+- HTTP http://localhost:5252 · HTTPS https://localhost:7178 (ports dans `Properties/launchSettings.json`).
 
 ## Base de données
+Identifiants dans `.env` (`DB_NAME=portfolio_arbiter`, port `13306`).
+Schéma des tables, **règles de liaison** (clés étrangères) et **accès CLI `mysql.exe`** :
+→ [`database.md`](database.md).
 
-- Identifiants dans `.env` : `DB_HOST=localhost`, `DB_PORT=13306`,
-  `DB_NAME=portfolio`, `DB_USER=portfolio`, `DB_PASSWORD=...` (à remplir).
-- La connexion **n'est pas testée au démarrage** (version serveur fixée
-  manuellement dans `Program.cs`) → l'app démarre même sans base lancée.
-- Pour créer/mettre à jour les tables : migrations EF Core
-  (`dotnet ef migrations add <Nom>` puis `dotnet ef database update`).
-- ⚠️ La table **`users`** est gérée « à la main » (le modèle `User` mappe une table
-  existante via `[Table]`/`[Column]`), on ne la recrée pas par migration.
+## Authentification & multilingue
+- Auth cookie, rôles (`visitor` / `subscriber` / `client` / `admin`), `[Authorize]` → [`AUTH.md`](AUTH.md).
+- Localisation FR/EN/ES (`IStringLocalizer`, `.resx`, `/Culture/Set`, langue au login) → [`I18N.md`](I18N.md).
 
-## Authentification & rôles
+## Sauvegarde (uniquement sur demande explicite)
+1. **commit** Git local avec message descriptif. 2. **push** → https://github.com/JackReality/webPotfolioArbiter-cs.git
 
-- **Mécanisme** : cookie natif .NET (`AddCookie`), **pas** ASP.NET Identity. Après
-  connexion réussie, un cookie chiffré contient l'identité (id, email, nom, **rôle**).
-- **Flux de connexion** : la page `/login` poste vers l'endpoint **`/auth/login`**
-  (dans `Program.cs`). Cet endpoint appelle `AuthService.VerifierIdentifiantsAsync`
-  (vérif **bcrypt**), puis pose le cookie (`SignInAsync`). Déconnexion : `/auth/logout`.
-  > Pourquoi un endpoint et pas un bouton ? Poser/retirer le cookie exige le
-  > `HttpContext`, indisponible dans un composant interactif Blazor Server.
-- **Protéger une page** : ajouter en haut du `.razor`
-  - `@attribute [Authorize]` → réservé aux **connectés** ;
-  - `@attribute [Authorize(Roles = "client,admin")]` → réservé à certains **rôles**.
-- **Rôles** (champ `User.Role`) : `visitor`, `subscriber`, `client`, `admin`.
-- **Que se passe-t-il si refusé ?** Géré dans `Routes.razor` (`AuthorizeRouteView`) :
-  non connecté → `RedirectToLogin` (vers `/login`) ; connecté mais mauvais rôle →
-  page `AccesReserve`.
-- **Lire l'utilisateur courant** dans une page : via une `<AuthorizeView>` ou un
-  paramètre en cascade `Task<AuthenticationState>` (activé par
-  `AddCascadingAuthenticationState` dans `Program.cs`).
+## Au démarrage de chaque session
+1. Claude lance `dotnet watch`. 2. Lire **`STATUS.md`** (section « À faire »).
+3. Attaquer la 1ʳᵉ tâche — ne pas redemander ce qui est déjà documenté ici ou dans `STATUS.md`.
 
-## Multilingue (FR / EN / ES)
-
-- **Textes** : ne JAMAIS écrire le texte en dur. Injecter
-  `@inject IStringLocalizer<SharedResource> L` et utiliser `@L["Ma.Cle"]`.
-- **Traductions** : dans `Resources/` (un fichier `.resx` par langue). `fr` = défaut.
-- **Changer de langue** : le sélecteur du header appelle l'endpoint `/Culture/Set`,
-  qui pose un cookie de langue puis recharge la page.
-
-## Lancer l'application
-
-```powershell
-dotnet run
-```
-- HTTP : **http://localhost:5252**
-- HTTPS : **https://localhost:7178**
-
-Ports définis dans `Properties/launchSettings.json` (modifiables).
+## Fichiers annexes (lus à la demande)
+- [`ARCHITECTURE.md`](ARCHITECTURE.md) — arborescence, sens des dépendances, **conventions de codage détaillées**.
+- [`AUTH.md`](AUTH.md) — mécanisme d'auth cookie, rôles, protection des pages.
+- [`I18N.md`](I18N.md) — localisation FR/EN/ES, colonne `language`, langue au login.
+- [`database.md`](database.md) — tables, clés étrangères, accès CLI MySQL, convention de nommage des pages.
+- [`PROCESSUS_TRAVAIL.md`](PROCESSUS_TRAVAIL.md) — règles de suivi des lots et de `STATUS.md`.
+- [`STATUS.md`](STATUS.md) — tâches en cours / faites.

@@ -9,9 +9,9 @@
 
     <MudTabs Rounded="true" ApplyEffectsToContainer="true">
         @* ----- Onglet 1 : Conditions générales (9 articles) ----- *@
-        <MudTabPanel Text="@L["Legal.Tab.Cgv"]">
-            <MudText Typo="Typo.h5" GutterBottom="true">@L["Legal.Cgv.Heading"]</MudText>
-            @RenderArticles("Legal.Cgv", 9)
+        <MudTabPanel Text="@L["Legal.Tab.Terms"]">
+            <MudText Typo="Typo.h5" GutterBottom="true">@L["Legal.Terms.Heading"]</MudText>
+            @RenderArticles("Legal.Terms", 9)
         </MudTabPanel>
 
         @* ----- Onglet 2 : Confidentialité (7 articles) ----- *@
@@ -22,13 +22,13 @@
         </MudTabPanel>
 
         @* ----- Onglet 3 : Mentions légales (4 articles + contact) ----- *@
-        <MudTabPanel Text="@L["Legal.Tab.Mentions"]">
-            <MudText Typo="Typo.h5" GutterBottom="true">@L["Legal.Mentions.Heading"]</MudText>
-            @RenderArticles("Legal.Mentions", 4)
+        <MudTabPanel Text="@L["Legal.Tab.LegalNotice"]">
+            <MudText Typo="Typo.h5" GutterBottom="true">@L["Legal.LegalNotice.Heading"]</MudText>
+            @RenderArticles("Legal.LegalNotice", 4)
 
             @* Article 5 : Contact — l'email n'est PAS dans le HTML, révélé au clic *@
             <div class="mb-6">
-                <MudText Typo="Typo.subtitle1"><strong>@L["Legal.Mentions.S5.Title"]</strong></MudText>
+                <MudText Typo="Typo.subtitle1"><strong>@L["Legal.LegalNotice.S5.Title"]</strong></MudText>
                 @if (_showEmail)
                 {
                     <MudLink Href="@($"mailto:{Email}")">@Email</MudLink>
@@ -37,7 +37,7 @@
                 {
                     <MudButton Variant="Variant.Outlined" Size="Size.Small" Class="mt-2"
                                OnClick="@(() => _showEmail = true)">
-                        @L["Legal.Mentions.ShowEmail"]
+                        @L["Legal.LegalNotice.ShowEmail"]
                     </MudButton>
                 }
             </div>

@@ -24,26 +24,29 @@
         <MudSpacer />
 
         <nav class="d-none d-md-flex">
-            <a href="/" class="pa-navlink @Active("")">@L["Nav.Accueil"]</a>
-            <a href="/telecharger" class="pa-navlink @Active("telecharger")">@L["Nav.Telecharger"]</a>
-            <a href="/formation" class="pa-navlink @Active("formation")">@L["Nav.Formation"]</a>
+            <a href="/" class="pa-navlink @Active("")">@L["Nav.Home"]</a>
+            <a href="/download" class="pa-navlink @Active("download")">@L["Nav.Download"]</a>
+            <a href="/training" class="pa-navlink @Active("training")">@L["Nav.Training"]</a>
         </nav>
 
         <MudSpacer />
 
         <div class="pa-lang me-4">
-            @* data-enhance-nav="false" => vrai rechargement, indispensable pour
-               que le changement de langue s'applique à tout le site. *@
-            <a href="@CultureHref("fr")" data-enhance-nav="false" class="@LangActive("fr")">FR</a>
+            @* On garde le href (repli en SSR / si le circuit n'est pas connecté), mais
+               on intercepte le clic pour forcer un VRAI rechargement complet
+               (NavigateTo forceLoad:true) : le routeur Blazor n'intercepte donc plus
+               la navigation vers l'endpoint /Culture/Set, et la langue s'applique
+               toujours à tout le site. *@
+            <a href="@CultureHref("fr")" @onclick:preventDefault @onclick='() => SetCulture("fr")' class="@LangActive("fr")">FR</a>
             <span class="sep">|</span>
-            <a href="@CultureHref("en")" data-enhance-nav="false" class="@LangActive("en")">EN</a>
+            <a href="@CultureHref("en")" @onclick:preventDefault @onclick='() => SetCulture("en")' class="@LangActive("en")">EN</a>
             <span class="sep">|</span>
-            <a href="@CultureHref("es")" data-enhance-nav="false" class="@LangActive("es")">ES</a>
+            <a href="@CultureHref("es")" @onclick:preventDefault @onclick='() => SetCulture("es")' class="@LangActive("es")">ES</a>
         </div>
         <AuthorizeView>
             <Authorized Context="authContext">
                 @* Picto utilisateur : avatar si photo, icône par défaut sinon *@
-                <a href="/profil" class="pa-user-avatar" title="@L["Profile.Title"]">
+                <a href="/profile" class="pa-user-avatar" title="@L["Profile.Title"]">
                     @if (!string.IsNullOrEmpty(_userAvatarUrl))
                     {
                         <img src="@_userAvatarUrl" alt="Avatar" class="pa-avatar-img" />
@@ -62,7 +65,7 @@
                 </form>
             </Authorized>
             <NotAuthorized>
-                <a href="/login" class="pa-navlink">@L["Nav.Connexion"]</a>
+                <a href="/login" class="pa-navlink">@L["Nav.Login"]</a>
             </NotAuthorized>
         </AuthorizeView>
     </MudAppBar>
@@ -176,4 +179,9 @@
         var redirect = "/" + Nav.ToBaseRelativePath(Nav.Uri);
         return $"/Culture/Set?culture={culture}&redirectUri={Uri.EscapeDataString(redirect)}";
     }
+
+    // Change la langue avec un VRAI rechargement (forceLoad) pour que le routeur
+    // Blazor n'intercepte pas la navigation vers l'endpoint /Culture/Set.
+    private void SetCulture(string culture)
+        => Nav.NavigateTo(CultureHref(culture), forceLoad: true);
 }

@@ -1,31 +1,31 @@
 @* Sous-composant : 3 sous-onglets langue (FR/EN/ES) avec éditeur subject + HTML *@
 
 <MudTabs Rounded="true" ApplyEffectsToContainer="true">
-    @foreach (var lang in _langs)
+    @foreach (var language in _languages)
     {
-        var template = Templates.FirstOrDefault(t => t.Lang == lang);
-        var langLabel = lang switch { "fr" => "Français", "en" => "English", _ => "Español" };
-        var localSubject = template?.Subject ?? "";
-        var localHtml = template?.Html ?? "";
+        var template = Templates.FirstOrDefault(t => t.Language == language);
+        var languageLabel = language switch { "fr" => "Français", "en" => "English", _ => "Español" };
 
-        <MudTabPanel Text="@langLabel">
+        <MudTabPanel Text="@languageLabel">
             @if (template is null)
             {
                 <MudAlert Severity="Severity.Warning">Pas de template pour cette langue.</MudAlert>
             }
             else
             {
+                @* On lie directement les champs de l'objet en mémoire : ainsi la valeur
+                   éditée n'est pas perdue lors d'un re-render après sauvegarde. *@
                 <div class="mt-4">
                     <label class="pa-field-label">Sujet</label>
-                    <input class="pa-input" @bind="localSubject" />
+                    <input class="pa-input" @bind="template.Subject" />
 
                     <label class="pa-field-label mt-4">Contenu HTML</label>
-                    <textarea class="pa-textarea" rows="16" @bind="localHtml"></textarea>
+                    <textarea class="pa-textarea" rows="16" @bind="template.Html"></textarea>
 
                     <div class="mt-4">
                         <MudButton Variant="Variant.Filled"
                                    Color="Color.Primary"
-                                   OnClick="() => OnSave(template.Id, localSubject, localHtml)">
+                                   OnClick="() => OnSave(template.Id, template.Subject, template.Html)">
                             Sauvegarder
                         </MudButton>
                     </div>
@@ -42,5 +42,5 @@
     [Parameter]
     public Func<ulong, string, string, Task> OnSave { get; set; } = null!;
 
-    private readonly List<string> _langs = new() { "fr", "en", "es" };
+    private readonly List<string> _languages = new() { "fr", "en", "es" };
 }

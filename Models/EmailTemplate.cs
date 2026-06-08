@@ -16,8 +16,8 @@ public class EmailTemplate
     [Column("key")]
     public string Key { get; set; } = string.Empty;   // ex: "confirm_signup", "recovery", "welcome"
 
-    [Column("lang")]
-    public string Lang { get; set; } = "fr";          // "fr", "en", "es"
+    [Column("language")]
+    public string Language { get; set; } = "fr";      // "fr", "en", "es"
 
     [Column("subject")]
     public string Subject { get; set; } = string.Empty;

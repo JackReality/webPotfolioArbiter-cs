@@ -1,7 +1,7 @@
 @page "/admin-dashboard"
+@attribute [Authorize(Roles = "admin")]
 @inject IStringLocalizer<SharedResource> L
 @inject NavigationManager Nav
-@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Admin - Dashboard</PageTitle>
 
@@ -9,33 +9,35 @@
     <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
         <MudText Typo="Typo.h4" GutterBottom="true">Admin Dashboard</MudText>
 
-        @if (!_isAdmin)
-        {
-            <MudAlert Severity="Severity.Warning">Accès réservé aux administrateurs.</MudAlert>
-        }
-        else
-        {
-            <MudText Class="mb-6">Gestion de l'administration du site.</MudText>
+        <MudText Class="mb-6">Gestion de l'administration du site.</MudText>
 
-            <MudButton Href="/admin/email-templates"
-                       Variant="Variant.Filled"
-                       Color="Color.Primary"
-                       Size="Size.Large"
-                       FullWidth="true"
-                       EndIcon="@Icons.Material.Filled.Email">
-                Modifier les templates d'emails
-            </MudButton>
-        }
+        <MudButton Href="/admin/email-templates"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   FullWidth="true"
+                   EndIcon="@Icons.Material.Filled.Email"
+                   Class="mb-4">
+            Modifier les templates d'emails
+        </MudButton>
+
+        <MudButton Href="/admin/users"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   FullWidth="true"
+                   EndIcon="@Icons.Material.Filled.People"
+                   Class="mb-4">
+            Gérer les utilisateurs
+        </MudButton>
+
+        <MudButton Href="/admin/trainings"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   FullWidth="true"
+                   EndIcon="@Icons.Material.Filled.School">
+            Gérer les formations
+        </MudButton>
     </MudPaper>
 </div>
-
-@code {
-    private bool _isAdmin;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
-        var roleClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.Role);
-        _isAdmin = roleClaim?.Value == "admin";
-    }
-}

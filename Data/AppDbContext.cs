@@ -26,4 +26,7 @@ public class AppDbContext : DbContext
 
     // Les jetons temporaires (confirmation, réinitialisation de mot de passe).
     public DbSet<EmailToken> EmailTokens => Set<EmailToken>();
+
+    // Les formations vendues sur le site (table "trainings").
+    public DbSet<Training> Trainings => Set<Training>();
 }

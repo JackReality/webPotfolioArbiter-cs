@@ -1,0 +1,168 @@
+@page "/admin/trainings"
+@attribute [Authorize(Roles = "admin")]
+@inject IStringLocalizer<SharedResource> L
+@inject TrainingService TrainingService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>Admin - Formations</PageTitle>
+
+<div class="pa-page" style="max-width:900px;">
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">Formations</MudText>
+
+        @* ===== Liste des formations existantes ===== *@
+        @if (!_loaded)
+        {
+            <MudProgressLinear Color="Color.Info" Indeterminate="true" />
+        }
+        else if (_trainings.Count == 0)
+        {
+            <MudAlert Severity="Severity.Info" Class="mb-4">Aucune formation pour l'instant.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="_trainings" Hover="true" Dense="true" Class="mb-6">
+                <HeaderContent>
+                    <MudTh>Titre</MudTh>
+                    <MudTh>Langue</MudTh>
+                    <MudTh>Stripe Price ID</MudTh>
+                    <MudTh>Créée le</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Titre">@context.Title</MudTd>
+                    <MudTd DataLabel="Langue">@context.Language.ToUpper()</MudTd>
+                    <MudTd DataLabel="Stripe Price ID">
+                        @(string.IsNullOrWhiteSpace(context.StripePriceId) ? "—" : context.StripePriceId)
+                    </MudTd>
+                    <MudTd DataLabel="Créée le">@context.CreatedAt.ToString("yyyy-MM-dd")</MudTd>
+                    <MudTd DataLabel="Actions">
+                        <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                       Color="Color.Error"
+                                       Size="Size.Small"
+                                       OnClick="() => SupprimerAsync(context)" />
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+        <MudDivider Class="my-4" />
+
+        @* ===== Formulaire d'ajout ===== *@
+        <MudText Typo="Typo.h6" GutterBottom="true">Ajouter une formation</MudText>
+
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+        }
+
+        <label class="pa-field-label">Titre *</label>
+        <input class="pa-input" @bind="_title" />
+
+        <label class="pa-field-label mt-4">Langue *</label>
+        <MudSelect @bind-Value="_language" Dense="true" Variant="Variant.Outlined" Class="mb-2">
+            <MudSelectItem Value="@("fr")">Français</MudSelectItem>
+            <MudSelectItem Value="@("en")">English</MudSelectItem>
+            <MudSelectItem Value="@("es")">Español</MudSelectItem>
+        </MudSelect>
+
+        <label class="pa-field-label mt-4">Description (HTML) *</label>
+        <textarea class="pa-textarea" rows="8" @bind="_descriptionHtml"></textarea>
+
+        <label class="pa-field-label mt-4">Stripe Product ID</label>
+        <input class="pa-input" @bind="_stripeProductId" placeholder="prod_..." />
+
+        <label class="pa-field-label mt-4">Stripe Price ID</label>
+        <input class="pa-input" @bind="_stripePriceId" placeholder="price_..." />
+
+        <label class="pa-field-label mt-4">Email de confirmation après achat (HTML)</label>
+        <textarea class="pa-textarea" rows="6" @bind="_confirmationEmailHtml"></textarea>
+
+        <div class="mt-4">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AjouterAsync">
+                Ajouter
+            </MudButton>
+        </div>
+
+        <MudDivider Class="my-6" />
+
+        <MudButton Href="/admin-dashboard"
+                   Variant="Variant.Outlined"
+                   StartIcon="@Icons.Material.Filled.ArrowBack">
+            Retour au Dashboard
+        </MudButton>
+    </MudPaper>
+</div>
+
+@code {
+    private bool _loaded;
+    private List<Models.Training> _trainings = new();
+    private string? _error;
+
+    // Champs du formulaire d'ajout.
+    private string _title = string.Empty;
+    private string _language = "fr";
+    private string _descriptionHtml = string.Empty;
+    private string _stripeProductId = string.Empty;
+    private string _stripePriceId = string.Empty;
+    private string _confirmationEmailHtml = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ChargerAsync();
+    }
+
+    private async Task ChargerAsync()
+    {
+        _trainings = await TrainingService.GetAllAsync();
+        _loaded = true;
+    }
+
+    private async Task AjouterAsync()
+    {
+        _error = null;
+
+        if (string.IsNullOrWhiteSpace(_title) || string.IsNullOrWhiteSpace(_descriptionHtml))
+        {
+            _error = "Le titre et la description sont obligatoires.";
+            return;
+        }
+
+        try
+        {
+            await TrainingService.CreerAsync(
+                _title.Trim(),
+                _language,
+                _descriptionHtml,
+                string.IsNullOrWhiteSpace(_stripeProductId) ? null : _stripeProductId.Trim(),
+                string.IsNullOrWhiteSpace(_stripePriceId) ? null : _stripePriceId.Trim(),
+                string.IsNullOrWhiteSpace(_confirmationEmailHtml) ? null : _confirmationEmailHtml);
+
+            // On vide le formulaire et on recharge la liste.
+            _title = _descriptionHtml = _stripeProductId = _stripePriceId = _confirmationEmailHtml = string.Empty;
+            _language = "fr";
+            Snackbar.Add("Formation ajoutée.", Severity.Success);
+            await ChargerAsync();
+        }
+        catch (Exception ex)
+        {
+            _error = ex.Message;
+        }
+    }
+
+    private async Task SupprimerAsync(Models.Training training)
+    {
+        var ok = await DialogService.ShowMessageBoxAsync(
+            "Confirmer la suppression",
+            $"Supprimer la formation « {training.Title} » ?",
+            yesText: "Supprimer", cancelText: "Annuler");
+
+        if (ok != true)
+            return;
+
+        await TrainingService.SupprimerAsync(training.Id);
+        Snackbar.Add("Formation supprimée.", Severity.Success);
+        await ChargerAsync();
+    }
+}

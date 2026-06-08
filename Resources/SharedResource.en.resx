@@ -61,15 +61,15 @@
 
   <!-- ===== Header / footer / common ===== -->
   <data name="Site.Name" xml:space="preserve"><value>Portfolio Arbiter</value></data>
-  <data name="Nav.Accueil" xml:space="preserve"><value>Home</value></data>
-  <data name="Nav.Telecharger" xml:space="preserve"><value>Download</value></data>
-  <data name="Nav.Formation" xml:space="preserve"><value>Course</value></data>
-  <data name="Nav.Connexion" xml:space="preserve"><value>Log in</value></data>
+  <data name="Nav.Home" xml:space="preserve"><value>Home</value></data>
+  <data name="Nav.Download" xml:space="preserve"><value>Download</value></data>
+  <data name="Nav.Training" xml:space="preserve"><value>Course</value></data>
+  <data name="Nav.Login" xml:space="preserve"><value>Log in</value></data>
   <data name="Footer.Rights" xml:space="preserve"><value>All rights reserved</value></data>
   <data name="Footer.Legal" xml:space="preserve"><value>Legal information</value></data>
   <data name="Common.ComingSoon" xml:space="preserve"><value>Coming soon.</value></data>
-  <data name="Telecharger.Title" xml:space="preserve"><value>Download</value></data>
-  <data name="Formation.Title" xml:space="preserve"><value>Course</value></data>
+  <data name="Download.Title" xml:space="preserve"><value>Download</value></data>
+  <data name="Training.Title" xml:space="preserve"><value>Course</value></data>
   <data name="Login.Title" xml:space="preserve"><value>Log in</value></data>
 
   <!-- ===== Home : Hero ===== -->
@@ -138,39 +138,39 @@ In practice, rebalancing is typically done one to four times per year.</value></
   <!-- ===== Legal ===== -->
   <data name="Legal.Title" xml:space="preserve"><value>Legal information</value></data>
   <data name="Legal.Intro" xml:space="preserve"><value>General terms, privacy policy and legal notice for Portfolio Arbiter (Reality Explorer Sàrl).</value></data>
-  <data name="Legal.Tab.Cgv" xml:space="preserve"><value>Terms &amp; Conditions</value></data>
+  <data name="Legal.Tab.Terms" xml:space="preserve"><value>Terms &amp; Conditions</value></data>
   <data name="Legal.Tab.Privacy" xml:space="preserve"><value>Privacy</value></data>
-  <data name="Legal.Tab.Mentions" xml:space="preserve"><value>Legal notice</value></data>
+  <data name="Legal.Tab.LegalNotice" xml:space="preserve"><value>Legal notice</value></data>
 
-  <data name="Legal.Cgv.Heading" xml:space="preserve"><value>General Terms of Sale and Use (T&amp;Cs)</value></data>
-  <data name="Legal.Cgv.S1.Title" xml:space="preserve"><value>1. Purpose</value></data>
-  <data name="Legal.Cgv.S1.Body" xml:space="preserve"><value>These terms govern the contractual relationship between Reality Explorer Sàrl (hereinafter "RE"), with registered office in Givisiez (Switzerland), and any individual or legal entity (hereinafter "the Client") wishing to acquire products or services through the PortfolioArbiter.com website.</value></data>
-  <data name="Legal.Cgv.S2.Title" xml:space="preserve"><value>2. License to use the Google Sheets files</value></data>
-  <data name="Legal.Cgv.S2.Body" xml:space="preserve"><value>RE provides the Client with proprietary management tools hosted on the Google Sheets platform.
+  <data name="Legal.Terms.Heading" xml:space="preserve"><value>General Terms of Sale and Use (T&amp;Cs)</value></data>
+  <data name="Legal.Terms.S1.Title" xml:space="preserve"><value>1. Purpose</value></data>
+  <data name="Legal.Terms.S1.Body" xml:space="preserve"><value>These terms govern the contractual relationship between Reality Explorer Sàrl (hereinafter "RE"), with registered office in Givisiez (Switzerland), and any individual or legal entity (hereinafter "the Client") wishing to acquire products or services through the PortfolioArbiter.com website.</value></data>
+  <data name="Legal.Terms.S2.Title" xml:space="preserve"><value>2. License to use the Google Sheets files</value></data>
+  <data name="Legal.Terms.S2.Body" xml:space="preserve"><value>RE provides the Client with proprietary management tools hosted on the Google Sheets platform.
 
 Private license: RE grants the Client a personal, non-exclusive and non-transferable license of use.
 
 Strict restrictions: The Client is authorized to use these sheets only for their own account. Distributing, reselling, sublicensing, publicly sharing or modifying these documents on behalf of third parties is strictly forbidden.
 
 Sanctions and penalty clause: Any breach of this clause or any attempt to circumvent access restrictions will trigger the immediate, definitive and automatic revocation of all Client accesses, without notice or formal demand, and without any right to a refund. Furthermore, the offender will immediately owe, as of right, a flat and irreducible penalty of CHF 50,000 (fifty thousand Swiss francs) per recorded infringement, as a penalty clause. RE will initiate immediate legal proceedings before the competent courts for violation of the Swiss Federal Copyright Act (LDA) and will demand full compensation for the commercial, technical and moral damage suffered.</value></data>
-  <data name="Legal.Cgv.S3.Title" xml:space="preserve"><value>3. Courses and financial strategies</value></data>
-  <data name="Legal.Cgv.S3.Body" xml:space="preserve"><value>RE offers paid courses explaining the technical use of the tools and presenting financial strategy methods.
+  <data name="Legal.Terms.S3.Title" xml:space="preserve"><value>3. Courses and financial strategies</value></data>
+  <data name="Legal.Terms.S3.Body" xml:space="preserve"><value>RE offers paid courses explaining the technical use of the tools and presenting financial strategy methods.
 
 Warning: These courses are strictly educational. RE does not provide personalized investment advice. The Client is solely responsible for their financial decisions and the risks taken on the markets.
 
 Liability: RE cannot be held liable for financial losses resulting from the application of the strategies taught or the use of the spreadsheets.</value></data>
-  <data name="Legal.Cgv.S4.Title" xml:space="preserve"><value>4. Pricing and payment</value></data>
-  <data name="Legal.Cgv.S4.Body" xml:space="preserve"><value>Prices are shown inclusive of all taxes on the website. Payment is due immediately upon order. For recurring access, the charge is automatic at each period. The Client may cancel their subscription up to 5 days before the renewal date.</value></data>
-  <data name="Legal.Cgv.S5.Title" xml:space="preserve"><value>5. No right of withdrawal</value></data>
-  <data name="Legal.Cgv.S5.Body" xml:space="preserve"><value>In accordance with the legislation on digital content, the Client acknowledges that by accessing the Google Sheets files or the course modules, they benefit from immediate execution of the service and expressly waive their right of withdrawal. No refund will be made after the access has been delivered.</value></data>
-  <data name="Legal.Cgv.S6.Title" xml:space="preserve"><value>6. Intellectual property</value></data>
-  <data name="Legal.Cgv.S6.Body" xml:space="preserve"><value>All structures, formulas, scripts and educational content remain the exclusive property of RE. No property right is transferred to the Client; only a license of use is granted.</value></data>
-  <data name="Legal.Cgv.S7.Title" xml:space="preserve"><value>7. Limitation of liability</value></data>
-  <data name="Legal.Cgv.S7.Body" xml:space="preserve"><value>RE cannot be held liable for indirect damages or financial losses related to the use of the products. RE does not guarantee the permanent availability of third-party services (Google Cloud/Sheets) required for the tools to function.</value></data>
-  <data name="Legal.Cgv.S8.Title" xml:space="preserve"><value>8. Bankruptcy and continuity</value></data>
-  <data name="Legal.Cgv.S8.Body" xml:space="preserve"><value>In the event of bankruptcy or cessation of activity of RE, service obligations cease immediately. The Client accepts the risk inherent to the continuity of a digital service and waives any claim for compensation in the event of permanent shutdown of the platforms.</value></data>
-  <data name="Legal.Cgv.S9.Title" xml:space="preserve"><value>9. Applicable law and jurisdiction</value></data>
-  <data name="Legal.Cgv.S9.Body" xml:space="preserve"><value>These T&amp;Cs are governed by Swiss law. Any dispute relating to their execution falls within the exclusive jurisdiction of the courts of the city of Fribourg.</value></data>
+  <data name="Legal.Terms.S4.Title" xml:space="preserve"><value>4. Pricing and payment</value></data>
+  <data name="Legal.Terms.S4.Body" xml:space="preserve"><value>Prices are shown inclusive of all taxes on the website. Payment is due immediately upon order. For recurring access, the charge is automatic at each period. The Client may cancel their subscription up to 5 days before the renewal date.</value></data>
+  <data name="Legal.Terms.S5.Title" xml:space="preserve"><value>5. No right of withdrawal</value></data>
+  <data name="Legal.Terms.S5.Body" xml:space="preserve"><value>In accordance with the legislation on digital content, the Client acknowledges that by accessing the Google Sheets files or the course modules, they benefit from immediate execution of the service and expressly waive their right of withdrawal. No refund will be made after the access has been delivered.</value></data>
+  <data name="Legal.Terms.S6.Title" xml:space="preserve"><value>6. Intellectual property</value></data>
+  <data name="Legal.Terms.S6.Body" xml:space="preserve"><value>All structures, formulas, scripts and educational content remain the exclusive property of RE. No property right is transferred to the Client; only a license of use is granted.</value></data>
+  <data name="Legal.Terms.S7.Title" xml:space="preserve"><value>7. Limitation of liability</value></data>
+  <data name="Legal.Terms.S7.Body" xml:space="preserve"><value>RE cannot be held liable for indirect damages or financial losses related to the use of the products. RE does not guarantee the permanent availability of third-party services (Google Cloud/Sheets) required for the tools to function.</value></data>
+  <data name="Legal.Terms.S8.Title" xml:space="preserve"><value>8. Bankruptcy and continuity</value></data>
+  <data name="Legal.Terms.S8.Body" xml:space="preserve"><value>In the event of bankruptcy or cessation of activity of RE, service obligations cease immediately. The Client accepts the risk inherent to the continuity of a digital service and waives any claim for compensation in the event of permanent shutdown of the platforms.</value></data>
+  <data name="Legal.Terms.S9.Title" xml:space="preserve"><value>9. Applicable law and jurisdiction</value></data>
+  <data name="Legal.Terms.S9.Body" xml:space="preserve"><value>These T&amp;Cs are governed by Swiss law. Any dispute relating to their execution falls within the exclusive jurisdiction of the courts of the city of Fribourg.</value></data>
 
   <data name="Legal.Privacy.Heading" xml:space="preserve"><value>Privacy policy</value></data>
   <data name="Legal.Privacy.Intro" xml:space="preserve"><value>The protection of your personal data is a priority for Reality Explorer Sàrl. This policy details how we process your information on the PortfolioArbiter.com website.</value></data>
@@ -202,9 +202,9 @@ Liability: RE cannot be held liable for financial losses resulting from the appl
   <data name="Legal.Privacy.S7.Title" xml:space="preserve"><value>7. Retention period</value></data>
   <data name="Legal.Privacy.S7.Body" xml:space="preserve"><value>Data linked to your account is kept for as long as your license or subscription is active. Accounting data is kept for the legal period of 10 years required by Swiss law.</value></data>
 
-  <data name="Legal.Mentions.Heading" xml:space="preserve"><value>Legal notice</value></data>
-  <data name="Legal.Mentions.S1.Title" xml:space="preserve"><value>1. Website publisher</value></data>
-  <data name="Legal.Mentions.S1.Body" xml:space="preserve"><value>The PortfolioArbiter.com website is published by:
+  <data name="Legal.LegalNotice.Heading" xml:space="preserve"><value>Legal notice</value></data>
+  <data name="Legal.LegalNotice.S1.Title" xml:space="preserve"><value>1. Website publisher</value></data>
+  <data name="Legal.LegalNotice.S1.Body" xml:space="preserve"><value>The PortfolioArbiter.com website is published by:
 
 Reality Explorer Sàrl
 Rue Robert-Stalder 15
@@ -212,19 +212,19 @@ Rue Robert-Stalder 15
 Switzerland
 
 Swiss business identification number (IDE): CHE-406.920.591</value></data>
-  <data name="Legal.Mentions.S2.Title" xml:space="preserve"><value>2. Publication manager</value></data>
-  <data name="Legal.Mentions.S2.Body" xml:space="preserve"><value>The person responsible for publication and content is Mr. Grillet.</value></data>
-  <data name="Legal.Mentions.S3.Title" xml:space="preserve"><value>3. Hosting</value></data>
-  <data name="Legal.Mentions.S3.Body" xml:space="preserve"><value>The site is hosted by:
+  <data name="Legal.LegalNotice.S2.Title" xml:space="preserve"><value>2. Publication manager</value></data>
+  <data name="Legal.LegalNotice.S2.Body" xml:space="preserve"><value>The person responsible for publication and content is Mr. Grillet.</value></data>
+  <data name="Legal.LegalNotice.S3.Title" xml:space="preserve"><value>3. Hosting</value></data>
+  <data name="Legal.LegalNotice.S3.Body" xml:space="preserve"><value>The site is hosted by:
 
 Infomaniak Network SA
 Rue Eugène-Marziano 25
 1227 Les Acacias, Geneva
 Switzerland</value></data>
-  <data name="Legal.Mentions.S4.Title" xml:space="preserve"><value>4. Intellectual property</value></data>
-  <data name="Legal.Mentions.S4.Body" xml:space="preserve"><value>All content (text, logos, calculation structures, videos) present on this site is the exclusive property of Reality Explorer Sàrl. Any unauthorized reproduction or distribution is strictly forbidden.</value></data>
-  <data name="Legal.Mentions.S5.Title" xml:space="preserve"><value>5. Contact</value></data>
-  <data name="Legal.Mentions.ShowEmail" xml:space="preserve"><value>Show email address</value></data>
+  <data name="Legal.LegalNotice.S4.Title" xml:space="preserve"><value>4. Intellectual property</value></data>
+  <data name="Legal.LegalNotice.S4.Body" xml:space="preserve"><value>All content (text, logos, calculation structures, videos) present on this site is the exclusive property of Reality Explorer Sàrl. Any unauthorized reproduction or distribution is strictly forbidden.</value></data>
+  <data name="Legal.LegalNotice.S5.Title" xml:space="preserve"><value>5. Contact</value></data>
+  <data name="Legal.LegalNotice.ShowEmail" xml:space="preserve"><value>Show email address</value></data>
 
   <!-- ===== Authentication ===== -->
   <data name="Nav.Logout" xml:space="preserve"><value>Log out</value></data>
@@ -236,10 +236,10 @@ Switzerland</value></data>
   <data name="Auth.CreateAccount" xml:space="preserve"><value>Create an account</value></data>
   <data name="Auth.Error" xml:space="preserve"><value>Incorrect email or password.</value></data>
   <data name="Register.Title" xml:space="preserve"><value>Create an account</value></data>
-  <data name="Reset.Title" xml:space="preserve"><value>Forgot password</value></data>
-  <data name="AccesReserve.Title" xml:space="preserve"><value>Restricted access</value></data>
-  <data name="AccesReserve.Body" xml:space="preserve"><value>This page is reserved for clients who have purchased a course.</value></data>
-  <data name="AccesReserve.Cta" xml:space="preserve"><value>View the course</value></data>
+  <data name="ForgotPassword.Title" xml:space="preserve"><value>Forgot password</value></data>
+  <data name="AccessDenied.Title" xml:space="preserve"><value>Restricted access</value></data>
+  <data name="AccessDenied.Body" xml:space="preserve"><value>This page is reserved for clients who have purchased a course.</value></data>
+  <data name="AccessDenied.Cta" xml:space="preserve"><value>View the course</value></data>
 
   <!-- ===== Profile ===== -->
   <data name="Profile.Title" xml:space="preserve"><value>My profile</value></data>
@@ -268,4 +268,5 @@ Switzerland</value></data>
 
   <!-- ===== Common ===== -->
   <data name="Common.Back" xml:space="preserve"><value>Back</value></data>
+  <data name="ClientArea.Title" xml:space="preserve"><value>Client area</value></data>
 </root>

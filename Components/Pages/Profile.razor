@@ -1,4 +1,4 @@
-@page "/profil"
+@page "/profile"
 @attribute [Authorize]
 @inject IStringLocalizer<SharedResource> L
 @inject UserService UserService
@@ -53,7 +53,7 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAsync">
                         @L["Profile.Save"]
                     </MudButton>
-                    <MudButton Href="/profil/changer-mdp" Variant="Variant.Outlined" Color="Color.Secondary">
+                    <MudButton Href="/reset-password" Variant="Variant.Outlined" Color="Color.Secondary">
                         @L["Profile.ChangePassword"]
                     </MudButton>
                 </div>
@@ -76,6 +76,10 @@
 </div>
 
 @code {
+    // ?saved=1 dans l'URL : on revient ici après le rechargement déclenché par
+    // le changement de langue, pour réafficher le message de succès.
+    [SupplyParameterFromQuery(Name = "saved")] public int? Saved { get; set; }
+
     private Models.User? _user;
     private bool _success;
     private bool _isAdmin;
@@ -83,6 +87,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _success = Saved == 1;
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var idClaim = authState.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
         if (idClaim != null && ulong.TryParse(idClaim.Value, out var userId))
@@ -106,7 +112,14 @@
             // On ne sauvegarde QUE les champs modifiables ici.
             // L'email est protégé (confirmation mail requise).
             await UserService.SauvegarderProfilAsync(_user.Id, _user.DisplayName, _user.Language);
-            _success = true;
+
+            // On applique la langue choisie à toute l'interface : on passe par
+            // l'endpoint /Culture/Set (qui pose le cookie de langue puis recharge),
+            // exactement comme le sélecteur du header. Poser un cookie nécessite le
+            // HttpContext → impossible directement dans un composant interactif, d'où
+            // ce rechargement complet (forceLoad: true).
+            var redirect = Uri.EscapeDataString("/profile?saved=1");
+            Nav.NavigateTo($"/Culture/Set?culture={_user.Language}&redirectUri={redirect}", forceLoad: true);
         }
         catch (Exception ex)
         {

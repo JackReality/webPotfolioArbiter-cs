@@ -1,0 +1,109 @@
+@page "/admin/users"
+@attribute [Authorize(Roles = "admin")]
+@inject IStringLocalizer<SharedResource> L
+@inject UserService UserService
+@inject IDialogService DialogService
+@inject ISnackbar Snackbar
+
+<PageTitle>Admin - Utilisateurs</PageTitle>
+
+<div class="pa-page" style="max-width:1000px;">
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">Utilisateurs</MudText>
+
+        @if (!_loaded)
+        {
+            <MudProgressLinear Color="Color.Info" Indeterminate="true" />
+        }
+        else if (_users.Count == 0)
+        {
+            <MudAlert Severity="Severity.Warning">Aucun utilisateur en base.</MudAlert>
+        }
+        else
+        {
+            <MudTable Items="_users" Hover="true" Dense="true" Striped="true">
+                <HeaderContent>
+                    <MudTh>Email</MudTh>
+                    <MudTh>Nom affiché</MudTh>
+                    <MudTh>Rôle</MudTh>
+                    <MudTh>Langue</MudTh>
+                    <MudTh>Créé le</MudTh>
+                    <MudTh>Actions</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Email">@context.Email</MudTd>
+                    <MudTd DataLabel="Nom affiché">@context.DisplayName</MudTd>
+                    <MudTd DataLabel="Rôle">
+                        <MudChip T="string" Size="Size.Small"
+                                 Color="@(context.Role == "admin" ? Color.Warning : Color.Default)">
+                            @context.Role
+                        </MudChip>
+                    </MudTd>
+                    <MudTd DataLabel="Langue">@context.Language</MudTd>
+                    <MudTd DataLabel="Créé le">@context.CreatedAt.ToString("yyyy-MM-dd")</MudTd>
+                    <MudTd DataLabel="Actions">
+                        @if (context.Role == "admin")
+                        {
+                            @* Un admin ne peut pas être supprimé : pas de bouton. *@
+                            <MudText Typo="Typo.caption" Style="opacity:.6;">protégé</MudText>
+                        }
+                        else
+                        {
+                            <MudIconButton Icon="@Icons.Material.Filled.Delete"
+                                           Color="Color.Error"
+                                           Size="Size.Small"
+                                           OnClick="() => SupprimerAsync(context)" />
+                        }
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        }
+
+        <div class="mt-6">
+            <MudButton Href="/admin-dashboard"
+                       Variant="Variant.Outlined"
+                       StartIcon="@Icons.Material.Filled.ArrowBack">
+                Retour au Dashboard
+            </MudButton>
+        </div>
+    </MudPaper>
+</div>
+
+@code {
+    private bool _loaded;
+    private List<Models.User> _users = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ChargerAsync();
+    }
+
+    private async Task ChargerAsync()
+    {
+        _users = await UserService.GetAllAsync();
+        _loaded = true;
+    }
+
+    private async Task SupprimerAsync(Models.User user)
+    {
+        // Confirmation avant suppression définitive.
+        var ok = await DialogService.ShowMessageBoxAsync(
+            "Confirmer la suppression",
+            $"Supprimer définitivement « {user.Email} » ? Cette action est irréversible.",
+            yesText: "Supprimer", cancelText: "Annuler");
+
+        if (ok != true)
+            return;
+
+        try
+        {
+            await UserService.SupprimerAsync(user.Id);
+            Snackbar.Add($"Utilisateur « {user.Email} » supprimé.", Severity.Success);
+            await ChargerAsync();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add(ex.Message, Severity.Error);
+        }
+    }
+}

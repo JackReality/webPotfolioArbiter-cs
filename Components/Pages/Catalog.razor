@@ -1,0 +1,88 @@
+@page "/catalog"
+@* Page PUBLIQUE : tout le monde peut consulter le catalogue. *@
+@using System.Globalization
+@inject IStringLocalizer<SharedResource> L
+@inject TrainingService TrainingService
+@inject ISnackbar Snackbar
+
+<PageTitle>Catalogue</PageTitle>
+
+<div class="pa-page" style="max-width:800px;">
+    <MudText Typo="Typo.h3" GutterBottom="true">Catalogue</MudText>
+
+    @if (!_loaded)
+    {
+        <MudProgressLinear Color="Color.Info" Indeterminate="true" />
+    }
+    else if (_trainings.Count == 0)
+    {
+        <MudAlert Severity="Severity.Info">Aucune formation disponible pour le moment.</MudAlert>
+    }
+    else
+    {
+        @for (var i = 0; i < _trainings.Count; i++)
+        {
+            var training = _trainings[i];
+
+            @* Trait de séparation entre les formations (sauf avant la première). *@
+            if (i > 0)
+            {
+                <MudDivider Class="my-8" />
+            }
+
+            <div class="mb-4">
+                <MudText Typo="Typo.h4" GutterBottom="true">@training.Title</MudText>
+
+                @* Bouton Acheter EN HAUT *@
+                <div class="my-4">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.ShoppingCart"
+                               OnClick="() => AcheterAsync(training)">
+                        Acheter
+                    </MudButton>
+                </div>
+
+                @* Description HTML (rendue telle quelle) *@
+                <div class="pa-formation-desc">
+                    @((MarkupString)training.DescriptionHtml)
+                </div>
+
+                @* Bouton Acheter EN BAS *@
+                <div class="my-4">
+                    <MudButton Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               Size="Size.Large"
+                               StartIcon="@Icons.Material.Filled.ShoppingCart"
+                               OnClick="() => AcheterAsync(training)">
+                        Acheter
+                    </MudButton>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private bool _loaded;
+    private List<Models.Training> _trainings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // On n'affiche que les formations de la langue courante (une formation par langue).
+        var language = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        _trainings = await TrainingService.GetByLanguageAsync(language);
+        _loaded = true;
+    }
+
+    private Task AcheterAsync(Models.Training training)
+    {
+        // TODO (Stripe) : construire la session Stripe Checkout à partir de
+        // training.StripePriceId, puis rediriger vers l'URL de paiement.
+        // En attente des clés Stripe dans .env et de la décision sur la montée
+        // en rôle (voir STATUS.md).
+        Snackbar.Add("Paiement bientôt disponible (Stripe à configurer).", Severity.Info);
+        return Task.CompletedTask;
+    }
+}

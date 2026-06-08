@@ -50,7 +50,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     .AddCookie(options =>
     {
         options.LoginPath = "/login";              // pas connecté → page de connexion
-        options.AccessDeniedPath = "/acces-reserve"; // connecté mais pas le bon rôle
+        options.AccessDeniedPath = "/access-denied"; // connecté mais pas le bon rôle
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
     });
@@ -64,6 +64,7 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<EmailTemplateService>();
 builder.Services.AddScoped<TokenService>();
 builder.Services.AddScoped<EmailService>();
+builder.Services.AddScoped<TrainingService>();
 
 var app = builder.Build();
 
@@ -134,6 +135,17 @@ app.MapPost("/auth/login", async (
     var principal = new ClaimsPrincipal(
         new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
     await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+    // On applique la langue enregistrée dans le profil : on pose le même cookie de
+    // langue que le sélecteur FR/EN/ES, pour que l'UI bascule dans la bonne langue
+    // dès la redirection après connexion.
+    if (languesSupportees.Contains(user.Language))
+    {
+        ctx.Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(
+                new RequestCulture(user.Language, user.Language)));
+    }
 
     return Results.LocalRedirect(string.IsNullOrWhiteSpace(returnUrl) ? "/" : returnUrl);
 });

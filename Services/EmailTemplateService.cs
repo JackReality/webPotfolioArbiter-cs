@@ -25,7 +25,7 @@ public class EmailTemplateService
     {
         return await _db.EmailTemplates
             .OrderBy(t => t.Key)
-            .ThenBy(t => t.Lang)
+            .ThenBy(t => t.Language)
             .ToListAsync();
     }
 
@@ -37,8 +37,27 @@ public class EmailTemplateService
     {
         return await _db.EmailTemplates
             .Where(t => t.Key == key)
-            .OrderBy(t => t.Lang)
+            .OrderBy(t => t.Language)
             .ToListAsync();
+    }
+
+    /// <summary>
+    /// Retourne UN template pour un type (key) et une langue donnés.
+    /// Si la langue demandée n'existe pas, on retombe sur le français ("fr").
+    /// Renvoie null si même le template français est absent.
+    /// </summary>
+    public async Task<EmailTemplate?> GetAsync(string key, string language)
+    {
+        var template = await _db.EmailTemplates
+            .FirstOrDefaultAsync(t => t.Key == key && t.Language == language);
+
+        if (template is null && language != "fr")
+        {
+            template = await _db.EmailTemplates
+                .FirstOrDefaultAsync(t => t.Key == key && t.Language == "fr");
+        }
+
+        return template;
     }
 
     /// <summary>

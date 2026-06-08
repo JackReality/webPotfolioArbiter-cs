@@ -23,6 +23,13 @@
     <ReconnectModal />
     <script src="@Assets["_framework/blazor.web.js"]"></script>
     <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <!-- Helpers login : lire la valeur réelle d'un champ (robuste à l'autofill du
+         navigateur) et soumettre le formulaire seulement après validation réussie
+         (pour poser le cookie côté endpoint). -->
+    <script>
+        window.getInputValue = id => document.getElementById(id)?.value ?? "";
+        window.submitForm = id => document.getElementById(id).submit();
+    </script>
 </body>
 
 </html>

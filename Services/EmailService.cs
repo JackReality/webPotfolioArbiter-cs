@@ -47,11 +47,20 @@ public class EmailService
     /// <param name="toEmail">Adresse email du destinataire</param>
     /// <param name="subject">Objet de l'email</param>
     /// <param name="htmlBody">Contenu HTML de l'email</param>
-    public async Task EnvoyerEmailAsync(string toEmail, string subject, string htmlBody)
+    /// <param name="replyTo">
+    /// Adresse de réponse facultative : si fournie, un clic sur « Répondre » dans le client
+    /// mail visera cette adresse (et non le From). Utile pour le formulaire de contact, où
+    /// l'on veut répondre directement au visiteur. Laisser null pour le comportement habituel.
+    /// </param>
+    public async Task EnvoyerEmailAsync(string toEmail, string subject, string htmlBody, string? replyTo = null)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(_fromName, _fromEmail));
         message.To.Add(new MailboxAddress("", toEmail));
+        if (!string.IsNullOrWhiteSpace(replyTo))
+        {
+            message.ReplyTo.Add(new MailboxAddress("", replyTo));
+        }
         message.Subject = subject;
 
         var bodyBuilder = new BodyBuilder

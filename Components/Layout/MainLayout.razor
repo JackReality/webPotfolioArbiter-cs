@@ -26,7 +26,8 @@
         <nav class="d-none d-md-flex">
             <a href="/" class="pa-navlink @Active("")">@L["Nav.Home"]</a>
             <a href="/download" class="pa-navlink @Active("download")">@L["Nav.Download"]</a>
-            <a href="/training" class="pa-navlink @Active("training")">@L["Nav.Training"]</a>
+            <a href="/catalog" class="pa-navlink @Active("catalog")">@L["Nav.Training"]</a>
+            <a href="/contact" class="pa-navlink @Active("contact")">@L["Nav.Contact"]</a>
         </nav>
 
         <MudSpacer />
@@ -66,6 +67,7 @@
             </Authorized>
             <NotAuthorized>
                 <a href="/login" class="pa-navlink">@L["Nav.Login"]</a>
+                <a href="/register" class="pa-navlink">@L["Nav.Register"]</a>
             </NotAuthorized>
         </AuthorizeView>
     </MudAppBar>

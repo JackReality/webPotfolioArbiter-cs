@@ -38,6 +38,10 @@
                     </MudTd>
                     <MudTd DataLabel="Créée le">@context.CreatedAt.ToString("yyyy-MM-dd")</MudTd>
                     <MudTd DataLabel="Actions">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit"
+                                       Color="Color.Primary"
+                                       Size="Size.Small"
+                                       OnClick="() => Editer(context)" />
                         <MudIconButton Icon="@Icons.Material.Filled.Delete"
                                        Color="Color.Error"
                                        Size="Size.Small"
@@ -49,8 +53,10 @@
 
         <MudDivider Class="my-4" />
 
-        @* ===== Formulaire d'ajout ===== *@
-        <MudText Typo="Typo.h6" GutterBottom="true">Ajouter une formation</MudText>
+        @* ===== Formulaire d'ajout / d'édition (réutilisé) ===== *@
+        <MudText Typo="Typo.h6" GutterBottom="true">
+            @(_editingId is null ? "Ajouter une formation" : "Modifier la formation")
+        </MudText>
 
         @if (!string.IsNullOrEmpty(_error))
         {
@@ -80,9 +86,15 @@
         <textarea class="pa-textarea" rows="6" @bind="_confirmationEmailHtml"></textarea>
 
         <div class="mt-4">
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="AjouterAsync">
-                Ajouter
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="EnregistrerAsync">
+                @(_editingId is null ? "Ajouter" : "Enregistrer")
             </MudButton>
+            @if (_editingId is not null)
+            {
+                <MudButton Variant="Variant.Outlined" Class="ml-2" OnClick="AnnulerEdition">
+                    Annuler
+                </MudButton>
+            }
         </div>
 
         <MudDivider Class="my-6" />
@@ -100,7 +112,8 @@
     private List<Models.Training> _trainings = new();
     private string? _error;
 
-    // Champs du formulaire d'ajout.
+    // Champs du formulaire (réutilisé pour l'ajout ET l'édition).
+    private ulong? _editingId;   // null = mode ajout ; sinon = id de la formation éditée
     private string _title = string.Empty;
     private string _language = "fr";
     private string _descriptionHtml = string.Empty;
@@ -119,7 +132,32 @@
         _loaded = true;
     }
 
-    private async Task AjouterAsync()
+    /// <summary>Charge une formation dans le formulaire et bascule en mode édition.</summary>
+    private void Editer(Models.Training training)
+    {
+        _error = null;
+        _editingId = training.Id;
+        _title = training.Title;
+        _language = training.Language;
+        _descriptionHtml = training.DescriptionHtml;
+        _stripeProductId = training.StripeProductId ?? string.Empty;
+        _stripePriceId = training.StripePriceId ?? string.Empty;
+        _confirmationEmailHtml = training.ConfirmationEmailHtml ?? string.Empty;
+    }
+
+    /// <summary>Quitte le mode édition et vide le formulaire (retour en mode ajout).</summary>
+    private void AnnulerEdition() => ReinitialiserFormulaire();
+
+    private void ReinitialiserFormulaire()
+    {
+        _editingId = null;
+        _title = _descriptionHtml = _stripeProductId = _stripePriceId = _confirmationEmailHtml = string.Empty;
+        _language = "fr";
+        _error = null;
+    }
+
+    /// <summary>Enregistre le formulaire : création si mode ajout, sinon mise à jour.</summary>
+    private async Task EnregistrerAsync()
     {
         _error = null;
 
@@ -129,20 +167,26 @@
             return;
         }
 
+        var productId = string.IsNullOrWhiteSpace(_stripeProductId) ? null : _stripeProductId.Trim();
+        var priceId = string.IsNullOrWhiteSpace(_stripePriceId) ? null : _stripePriceId.Trim();
+        var confirmationEmail = string.IsNullOrWhiteSpace(_confirmationEmailHtml) ? null : _confirmationEmailHtml;
+
         try
         {
-            await TrainingService.CreerAsync(
-                _title.Trim(),
-                _language,
-                _descriptionHtml,
-                string.IsNullOrWhiteSpace(_stripeProductId) ? null : _stripeProductId.Trim(),
-                string.IsNullOrWhiteSpace(_stripePriceId) ? null : _stripePriceId.Trim(),
-                string.IsNullOrWhiteSpace(_confirmationEmailHtml) ? null : _confirmationEmailHtml);
+            if (_editingId is null)
+            {
+                await TrainingService.CreerAsync(
+                    _title.Trim(), _language, _descriptionHtml, productId, priceId, confirmationEmail);
+                Snackbar.Add("Formation ajoutée.", Severity.Success);
+            }
+            else
+            {
+                await TrainingService.UpdateAsync(
+                    _editingId.Value, _title.Trim(), _language, _descriptionHtml, productId, priceId, confirmationEmail);
+                Snackbar.Add("Formation modifiée.", Severity.Success);
+            }
 
-            // On vide le formulaire et on recharge la liste.
-            _title = _descriptionHtml = _stripeProductId = _stripePriceId = _confirmationEmailHtml = string.Empty;
-            _language = "fr";
-            Snackbar.Add("Formation ajoutée.", Severity.Success);
+            ReinitialiserFormulaire();
             await ChargerAsync();
         }
         catch (Exception ex)

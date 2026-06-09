@@ -8,10 +8,6 @@
 
 ## 1. À faire
 
-### 🆕 Lot « Contact + page Training » (demandé le 2026-06-08)
-- [ ] **Formulaire de contact** : page/section avec champs (nom, email, message) qui **envoie la demande à `contact@realityexplorer.com`** via `EmailService` (MailKit, déjà configuré). Prévoir : validation des champs, message de succès, et gestion d'erreur silencieuse (log serveur). *(à décider : route dédiée `/contact` ou bloc réutilisable.)*
-- [ ] **Page Training** (`/training`, `Training.razor`) : afficher la **liste des formations dans la langue du site** (`TrainingService.GetByLanguageAsync(CurrentUICulture)`, comme `Catalog.razor`). **Si aucune formation** : message type « Pas de formation pour le moment, mais envoyez-nous une demande et nous serons ravis d'y répondre » + lien vers le **formulaire de contact** (lié à la tâche ci-dessus). ⚠️ **À clarifier** : `Catalog.razor` (`/catalog`) fait déjà cette liste filtrée par langue → fusionner les deux pages, ou `/training` remplace `/catalog` ?
-
 ### 🟢 Lot « Achat (Stripe) » — squelette, 1 sous-étape à la fois
 
 > Décisions actées : **squelette seulement** (clés en placeholders dans `.env`, à remplir
@@ -25,7 +21,7 @@
 - [ ] **Étape 4 — Email de confirmation** après achat, via `training.ConfirmationEmailHtml` (envoyé par `EmailService`).
 
 ### 🔵 Auth — étape 2 (prioritaire)
-- [ ] **Inscription** (`/register`) : formulaire + création user (bcrypt) + email de confirmation via `email_templates` (FR/EN/ES) et jeton dans `email_tokens` (purpose `confirm`).
+- [x] **Inscription** (`/register`) + confirmation email (`/confirm-email`) + lien « S'inscrire » dans le header.
 - [ ] Bloquer la connexion si `email_confirmed = 0` (au choix).
 - [ ] Page **profil** (`/profile`) : il reste la **photo** (changement pseudo/langue/mot de passe déjà faits).
 
@@ -44,7 +40,7 @@
 - [ ] **Forum** des visiteurs/clients.
 
 ### 🛠️ Admin
-- [ ] **Modifier une formation** (`/admin/trainings`, `AdminTraining.razor`) : aujourd'hui on peut lister / ajouter / supprimer, mais **pas éditer**. Ajouter l'édition d'une formation existante (titre, langue, description HTML, Stripe IDs, email de confirmation) → `TrainingService.UpdateAsync`.
+- [x] **Modifier une formation** (`/admin/trainings`) : édition via `_editingId` + `TrainingService.UpdateAsync`.
 - [ ] Gestion des rôles utilisateurs (la **liste + suppression** est faite, voir Fait 06-08).
 - [ ] Éditeur des `email_templates` (FR/EN/ES) — *partiellement fait, à finaliser*.
 
@@ -132,8 +128,22 @@
 
 ---
 
-## 5. Fait le [À venir]
-*(Aucun historique supplémentaire pour le moment)*
+## 5. Fait le 2026-06-09
+
+### Lot « Édition formation »
+- [x] `TrainingService.UpdateAsync` : met à jour les 6 champs, garde `CreatedAt`.
+- [x] Bouton ✏️ par ligne dans `AdminTraining.razor` → mode édition (`_editingId`) + snackbar « Formation modifiée. »
+
+### Lot « Contact + Catalog »
+- [x] Page `/contact` (`Contact.razor`) : formulaire nom/email/message, envoi via `EmailService`, clés i18n `Contact.*` (FR/EN/ES), lien au menu.
+- [x] Menu « Formation » et CTA `AccessDenied` redirigés vers `/catalog`.
+- [x] Catalog : état vide remplacé par message + bouton `/contact` (`Catalog.Empty`).
+
+### Auth étape 2 — Inscription
+- [x] `UserService.RegisterAsync` (vérifie email, crée user bcrypt, `email_confirmed=0`) + `ConfirmEmailAsync`.
+- [x] Page `/register` : formulaire + envoi email `confirm_signup` via template MySQL (placeholder `{{ .ConfirmationURL }}`), lien de confirmation valide 24h.
+- [x] Page `/confirm-email?token=` : valide le jeton, met `email_confirmed=1`, supprime le token.
+- [x] Lien « S'inscrire » (`Nav.Register`) dans le header (visible si non connecté). Clés i18n FR/EN/ES.
 
 ## 6. Fait le [À venir]
 *(Aucun historique supplémentaire pour le moment)*

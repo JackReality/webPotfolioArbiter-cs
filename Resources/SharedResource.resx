@@ -75,6 +75,9 @@
   <data name="Nav.Login" xml:space="preserve">
     <value>Connexion</value>
   </data>
+  <data name="Nav.Register" xml:space="preserve">
+    <value>S'inscrire</value>
+  </data>
   <data name="Footer.Rights" xml:space="preserve">
     <value>Tous droits réservés</value>
   </data>
@@ -409,6 +412,16 @@ Suisse</value>
   <data name="Auth.CreateAccount" xml:space="preserve"><value>Créer un compte</value></data>
   <data name="Auth.Error" xml:space="preserve"><value>Email ou mot de passe incorrect.</value></data>
   <data name="Register.Title" xml:space="preserve"><value>Créer un compte</value></data>
+  <data name="Register.Subtitle" xml:space="preserve"><value>Remplissez le formulaire pour créer votre compte.</value></data>
+  <data name="Register.PasswordConfirm" xml:space="preserve"><value>Confirmer le mot de passe</value></data>
+  <data name="Register.Submit" xml:space="preserve"><value>S'inscrire</value></data>
+  <data name="Register.SuccessMessage" xml:space="preserve"><value>Un email de confirmation a été envoyé à votre adresse. Vérifiez votre boîte mail.</value></data>
+  <data name="Register.EmailTaken" xml:space="preserve"><value>Cette adresse email est déjà utilisée.</value></data>
+  <data name="Register.AlreadyHaveAccount" xml:space="preserve"><value>Déjà inscrit ? Se connecter</value></data>
+  <data name="ConfirmEmail.Title" xml:space="preserve"><value>Confirmation de l'email</value></data>
+  <data name="ConfirmEmail.Success" xml:space="preserve"><value>Votre adresse email a été confirmée. Vous pouvez maintenant vous connecter.</value></data>
+  <data name="ConfirmEmail.InvalidToken" xml:space="preserve"><value>Ce lien de confirmation est invalide ou a expiré. Veuillez vous réinscrire.</value></data>
+  <data name="ConfirmEmail.TryAgain" xml:space="preserve"><value>Créer un nouveau compte</value></data>
   <data name="ForgotPassword.Title" xml:space="preserve"><value>Mot de passe oublié</value></data>
   <data name="ForgotPassword.Subtitle" xml:space="preserve"><value>Entrez votre adresse e-mail pour recevoir un lien de réinitialisation.</value></data>
   <data name="ForgotPassword.SuccessMessage" xml:space="preserve"><value>Si un compte est associé à cette adresse, vous recevrez un e-mail avec un lien de réinitialisation sous peu.</value></data>
@@ -450,4 +463,19 @@ Suisse</value>
   <data name="Common.Back" xml:space="preserve"><value>Retour</value></data>
   <data name="Common.BackToLogin" xml:space="preserve"><value>Retour à la connexion</value></data>
   <data name="ClientArea.Title" xml:space="preserve"><value>Espace client</value></data>
+
+  <!-- ===== Contact ===== -->
+  <data name="Nav.Contact" xml:space="preserve"><value>Contact</value></data>
+  <data name="Contact.Title" xml:space="preserve"><value>Contactez-nous</value></data>
+  <data name="Contact.Subtitle" xml:space="preserve"><value>Une question ? Envoyez-nous un message, nous serons ravis d'y répondre.</value></data>
+  <data name="Contact.Name" xml:space="preserve"><value>Nom</value></data>
+  <data name="Contact.Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Contact.Message" xml:space="preserve"><value>Message</value></data>
+  <data name="Contact.Submit" xml:space="preserve"><value>Envoyer</value></data>
+  <data name="Contact.Success" xml:space="preserve"><value>Merci ! Votre message a bien été envoyé.</value></data>
+  <data name="Contact.Error" xml:space="preserve"><value>Une erreur est survenue lors de l'envoi. Veuillez réessayer plus tard.</value></data>
+  <data name="Contact.FillAll" xml:space="preserve"><value>Veuillez remplir tous les champs.</value></data>
+  <data name="Contact.InvalidEmail" xml:space="preserve"><value>Veuillez entrer une adresse email valide.</value></data>
+  <!-- ===== Catalog ===== -->
+  <data name="Catalog.Empty" xml:space="preserve"><value>Pas de formation pour le moment, mais envoyez-nous une demande et nous reviendrons vers vous.</value></data>
 </root>

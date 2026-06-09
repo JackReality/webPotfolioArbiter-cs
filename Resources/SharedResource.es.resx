@@ -65,6 +65,7 @@
   <data name="Nav.Download" xml:space="preserve"><value>Descargar</value></data>
   <data name="Nav.Training" xml:space="preserve"><value>Formación</value></data>
   <data name="Nav.Login" xml:space="preserve"><value>Iniciar sesión</value></data>
+  <data name="Nav.Register" xml:space="preserve"><value>Registrarse</value></data>
   <data name="Footer.Rights" xml:space="preserve"><value>Todos los derechos reservados</value></data>
   <data name="Footer.Legal" xml:space="preserve"><value>Información legal</value></data>
   <data name="Common.ComingSoon" xml:space="preserve"><value>Próximamente.</value></data>
@@ -236,6 +237,16 @@ Suiza</value></data>
   <data name="Auth.CreateAccount" xml:space="preserve"><value>Crear una cuenta</value></data>
   <data name="Auth.Error" xml:space="preserve"><value>Correo o contraseña incorrectos.</value></data>
   <data name="Register.Title" xml:space="preserve"><value>Crear una cuenta</value></data>
+  <data name="Register.Subtitle" xml:space="preserve"><value>Rellena el formulario para crear tu cuenta.</value></data>
+  <data name="Register.PasswordConfirm" xml:space="preserve"><value>Confirmar contraseña</value></data>
+  <data name="Register.Submit" xml:space="preserve"><value>Registrarse</value></data>
+  <data name="Register.SuccessMessage" xml:space="preserve"><value>Se ha enviado un email de confirmación a tu dirección. Revisa tu bandeja de entrada.</value></data>
+  <data name="Register.EmailTaken" xml:space="preserve"><value>Este correo electrónico ya está en uso.</value></data>
+  <data name="Register.AlreadyHaveAccount" xml:space="preserve"><value>¿Ya tienes una cuenta? Iniciar sesión</value></data>
+  <data name="ConfirmEmail.Title" xml:space="preserve"><value>Confirmación del email</value></data>
+  <data name="ConfirmEmail.Success" xml:space="preserve"><value>Tu dirección de email ha sido confirmada. Ya puedes iniciar sesión.</value></data>
+  <data name="ConfirmEmail.InvalidToken" xml:space="preserve"><value>Este enlace de confirmación es inválido o ha expirado. Por favor regístrate de nuevo.</value></data>
+  <data name="ConfirmEmail.TryAgain" xml:space="preserve"><value>Crear una nueva cuenta</value></data>
   <data name="ForgotPassword.Title" xml:space="preserve"><value>Contraseña olvidada</value></data>
   <data name="AccessDenied.Title" xml:space="preserve"><value>Acceso restringido</value></data>
   <data name="AccessDenied.Body" xml:space="preserve"><value>Esta página está reservada a los clientes que han comprado una formación.</value></data>
@@ -268,5 +279,22 @@ Suiza</value></data>
 
   <!-- ===== Común ===== -->
   <data name="Common.Back" xml:space="preserve"><value>Volver</value></data>
+  <data name="Common.BackToLogin" xml:space="preserve"><value>Volver al inicio de sesión</value></data>
+  <data name="Common.Sending" xml:space="preserve"><value>Enviando...</value></data>
   <data name="ClientArea.Title" xml:space="preserve"><value>Área de cliente</value></data>
+
+  <!-- ===== Contacto ===== -->
+  <data name="Nav.Contact" xml:space="preserve"><value>Contacto</value></data>
+  <data name="Contact.Title" xml:space="preserve"><value>Contáctenos</value></data>
+  <data name="Contact.Subtitle" xml:space="preserve"><value>¿Tiene una pregunta? Envíenos un mensaje, estaremos encantados de responder.</value></data>
+  <data name="Contact.Name" xml:space="preserve"><value>Nombre</value></data>
+  <data name="Contact.Email" xml:space="preserve"><value>Email</value></data>
+  <data name="Contact.Message" xml:space="preserve"><value>Mensaje</value></data>
+  <data name="Contact.Submit" xml:space="preserve"><value>Enviar</value></data>
+  <data name="Contact.Success" xml:space="preserve"><value>¡Gracias! Su mensaje ha sido enviado.</value></data>
+  <data name="Contact.Error" xml:space="preserve"><value>Se produjo un error al enviar. Inténtelo de nuevo más tarde.</value></data>
+  <data name="Contact.FillAll" xml:space="preserve"><value>Por favor complete todos los campos.</value></data>
+  <data name="Contact.InvalidEmail" xml:space="preserve"><value>Por favor ingrese una dirección de email válida.</value></data>
+  <!-- ===== Catalog ===== -->
+  <data name="Catalog.Empty" xml:space="preserve"><value>No hay formación disponible por el momento, pero envíenos una solicitud y le responderemos.</value></data>
 </root>

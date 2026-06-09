@@ -16,7 +16,13 @@
     }
     else if (_trainings.Count == 0)
     {
-        <MudAlert Severity="Severity.Info">Aucune formation disponible pour le moment.</MudAlert>
+        <MudAlert Severity="Severity.Info" Class="mb-4">@L["Catalog.Empty"]</MudAlert>
+        <MudButton Href="/contact"
+                   Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Email">
+            @L["Nav.Contact"]
+        </MudButton>
     }
     else
     {

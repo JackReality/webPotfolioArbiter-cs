@@ -65,6 +65,30 @@ public class TrainingService
         return training;
     }
 
+    /// <summary>
+    /// Écriture : MET À JOUR une formation existante (les 6 champs éditables).
+    /// On conserve <see cref="Training.CreatedAt"/>. Renvoie false si introuvable.
+    /// </summary>
+    public async Task<bool> UpdateAsync(
+        ulong id,
+        string title, string language, string descriptionHtml,
+        string? stripeProductId, string? stripePriceId, string? confirmationEmailHtml)
+    {
+        var training = await _db.Trainings.FindAsync(id);
+        if (training is null)
+            return false;
+
+        training.Title = title;
+        training.Language = language;
+        training.DescriptionHtml = descriptionHtml;
+        training.StripeProductId = stripeProductId;
+        training.StripePriceId = stripePriceId;
+        training.ConfirmationEmailHtml = confirmationEmailHtml;
+
+        await _db.SaveChangesAsync();
+        return true;
+    }
+
     /// <summary>Écriture : SUPPRIME une formation. Renvoie false si introuvable.</summary>
     public async Task<bool> SupprimerAsync(ulong id)
     {

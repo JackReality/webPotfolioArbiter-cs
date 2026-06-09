@@ -63,6 +63,43 @@ public class UserService
     }
 
     /// <summary>
+    /// Écriture : INSCRIPTION d'un nouvel utilisateur.
+    /// Vérifie que l'email n'est pas déjà utilisé (→ null).
+    /// Sinon crée le compte (bcrypt, rôle subscriber, email_confirmed=false) et renvoie l'id.
+    /// </summary>
+    public async Task<ulong?> RegisterAsync(string email, string password, string displayName, string language)
+    {
+        var exists = await _db.Users.AnyAsync(u => u.Email == email);
+        if (exists)
+            return null;
+
+        var user = new User
+        {
+            Email = email,
+            DisplayName = displayName,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
+            Language = language,
+            Role = "subscriber",
+            EmailConfirmed = false,
+        };
+
+        _db.Users.Add(user);
+        await _db.SaveChangesAsync();
+        return user.Id;
+    }
+
+    /// <summary>
+    /// Écriture : confirme l'email d'un utilisateur (met email_confirmed = true).
+    /// </summary>
+    public async Task ConfirmEmailAsync(ulong id)
+    {
+        var user = await _db.Users.FindAsync(id);
+        if (user is null) return;
+        user.EmailConfirmed = true;
+        await _db.SaveChangesAsync();
+    }
+
+    /// <summary>
     /// Écriture : CRÉE un compte. On hache le mot de passe (jamais en clair),
     /// on ajoute la ligne, puis on enregistre en base.
     /// Renvoie l'utilisateur créé (avec son Id rempli par la base).

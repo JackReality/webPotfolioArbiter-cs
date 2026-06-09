@@ -1,0 +1,103 @@
+@page "/contact"
+@* Page PUBLIQUE : tout le monde peut envoyer un message. *@
+@inject IStringLocalizer<SharedResource> L
+@inject EmailService EmailService
+@using DotNetEnv
+@using System.Net
+@using System.Text.RegularExpressions
+
+<PageTitle>@L["Contact.Title"]</PageTitle>
+
+<div class="pa-page" style="max-width:460px;">
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">@L["Contact.Title"]</MudText>
+        <MudText Class="mb-4" Style="opacity:.8;">@L["Contact.Subtitle"]</MudText>
+
+        @if (_success)
+        {
+            <MudAlert Severity="Severity.Success" Class="mb-4">@L["Contact.Success"]</MudAlert>
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+            }
+
+            <form @onsubmit="SendAsync" @onsubmit:preventDefault>
+                <label class="pa-field-label">@L["Contact.Name"]</label>
+                <input class="pa-input" type="text" @bind="_name" required autocomplete="name" />
+
+                <label class="pa-field-label">@L["Contact.Email"]</label>
+                <input class="pa-input" type="email" @bind="_email" required autocomplete="email" />
+
+                <label class="pa-field-label">@L["Contact.Message"]</label>
+                <textarea class="pa-input" rows="6" @bind="_message" required></textarea>
+
+                <button class="pa-submit" type="submit" Disabled="@_isLoading">
+                    @(_isLoading ? L["Common.Sending"] : L["Contact.Submit"])
+                </button>
+            </form>
+        }
+    </MudPaper>
+</div>
+
+@code {
+    private string _name = string.Empty;
+    private string _email = string.Empty;
+    private string _message = string.Empty;
+    private string? _error;
+    private bool _success;
+    private bool _isLoading;
+
+    private async Task SendAsync()
+    {
+        _error = null;
+        _isLoading = true;
+
+        try
+        {
+            // Validation : tous les champs sont requis.
+            if (string.IsNullOrWhiteSpace(_name)
+                || string.IsNullOrWhiteSpace(_email)
+                || string.IsNullOrWhiteSpace(_message))
+            {
+                _error = L["Contact.FillAll"];
+                return;
+            }
+
+            // Format d'email basique (la vraie validation est faite par Stripe/SMTP).
+            if (!Regex.IsMatch(_email, @"^[^@\s]+@[^@\s]+\.[^@\s]+$"))
+            {
+                _error = L["Contact.InvalidEmail"];
+                return;
+            }
+
+            // Destinataire : CONTACT_EMAIL du .env, repli sur l'adresse par défaut.
+            var to = Env.GetString("CONTACT_EMAIL", "contact@realityexplorer.com");
+
+            // On encode les valeurs saisies pour éviter toute injection HTML dans l'email.
+            var subject = $"[Contact] {WebUtility.HtmlEncode(_name)}";
+            var htmlBody = $@"<p><strong>Nom :</strong> {WebUtility.HtmlEncode(_name)}</p>
+                <p><strong>Email :</strong> {WebUtility.HtmlEncode(_email)}</p>
+                <p><strong>Message :</strong></p>
+                <p>{WebUtility.HtmlEncode(_message).Replace("\n", "<br/>")}</p>";
+
+            // replyTo = email du visiteur : un clic sur « Répondre » vise directement le visiteur.
+            await EmailService.EnvoyerEmailAsync(to, subject, htmlBody, replyTo: _email);
+
+            _success = true;
+        }
+        catch (Exception ex)
+        {
+            // L'échec d'envoi n'est jamais révélé en détail à l'utilisateur : on loggue
+            // côté serveur et on affiche un message générique.
+            Console.Error.WriteLine($"[Contact] Échec d'envoi du message de contact : {ex}");
+            _error = L["Contact.Error"];
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

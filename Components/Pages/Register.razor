@@ -1,9 +1,141 @@
 @page "/register"
 @inject IStringLocalizer<SharedResource> L
+@inject UserService UserService
+@inject TokenService TokenService
+@inject EmailService EmailService
+@inject EmailTemplateService TemplateService
+@using DotNetEnv
+@using System.Text.RegularExpressions
 
 <PageTitle>@L["Register.Title"]</PageTitle>
 
 <div class="pa-page" style="max-width:460px;">
-    <MudText Typo="Typo.h3" GutterBottom="true">@L["Register.Title"]</MudText>
-    <MudText>@L["Common.ComingSoon"]</MudText>
+    <MudPaper Class="pa-6" Elevation="0" Style="background:#141414;">
+        <MudText Typo="Typo.h4" GutterBottom="true">@L["Register.Title"]</MudText>
+        <MudText Class="mb-4" Style="opacity:.8;">@L["Register.Subtitle"]</MudText>
+
+        @if (_success)
+        {
+            <MudAlert Severity="Severity.Success" Class="mb-4">@L["Register.SuccessMessage"]</MudAlert>
+            <div class="mt-4">
+                <MudLink Href="/login">@L["Common.BackToLogin"]</MudLink>
+            </div>
+        }
+        else
+        {
+            @if (!string.IsNullOrEmpty(_error))
+            {
+                <MudAlert Severity="Severity.Error" Class="mb-4">@_error</MudAlert>
+            }
+
+            <form @onsubmit="SubmitAsync" @onsubmit:preventDefault>
+                <label class="pa-field-label">@L["Profile.DisplayName"]</label>
+                <input class="pa-input" type="text" @bind="_displayName" required autocomplete="name" />
+
+                <label class="pa-field-label">@L["Auth.Email"]</label>
+                <input class="pa-input" type="email" @bind="_email" required autocomplete="email" />
+
+                <label class="pa-field-label">@L["Auth.Password"]</label>
+                <input class="pa-input" type="password" @bind="_password" required autocomplete="new-password" />
+
+                <label class="pa-field-label">@L["Register.PasswordConfirm"]</label>
+                <input class="pa-input" type="password" @bind="_passwordConfirm" required autocomplete="new-password" />
+
+                <button class="pa-submit" type="submit" disabled="@_isLoading">
+                    @(_isLoading ? L["Common.Sending"] : L["Register.Submit"])
+                </button>
+            </form>
+
+            <div class="mt-4">
+                <MudLink Href="/login">@L["Register.AlreadyHaveAccount"]</MudLink>
+            </div>
+        }
+    </MudPaper>
 </div>
+
+@code {
+    private string _displayName = string.Empty;
+    private string _email = string.Empty;
+    private string _password = string.Empty;
+    private string _passwordConfirm = string.Empty;
+    private string? _error;
+    private bool _success;
+    private bool _isLoading;
+
+    private async Task SubmitAsync()
+    {
+        _error = null;
+        _isLoading = true;
+
+        if (string.IsNullOrWhiteSpace(_displayName) || string.IsNullOrWhiteSpace(_email) ||
+            string.IsNullOrWhiteSpace(_password) || string.IsNullOrWhiteSpace(_passwordConfirm))
+        {
+            _error = L["ChangePassword.FillAll"];
+            _isLoading = false;
+            return;
+        }
+
+        if (_password != _passwordConfirm)
+        {
+            _error = L["ChangePassword.Mismatch"];
+            _isLoading = false;
+            return;
+        }
+
+        try
+        {
+            var language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var userId = await UserService.RegisterAsync(_email, _password, _displayName, language);
+
+            if (userId is null)
+            {
+                _error = L["Register.EmailTaken"];
+                _isLoading = false;
+                return;
+            }
+
+            var token = await TokenService.GenererJetonsAsync(userId.Value, "confirm_signup", dureeHeures: 24);
+
+            var baseUrl = Env.GetString("BASE_URL", "http://localhost:5252").TrimEnd('/');
+            var confirmLink = $"{baseUrl}/confirm-email?token={token}";
+
+            var template = await TemplateService.GetAsync("confirm_signup", language);
+
+            string subject;
+            string htmlBody;
+            if (template != null)
+            {
+                subject = template.Subject;
+                htmlBody = Regex.Replace(
+                    template.Html,
+                    @"\{\{\s*\.?ConfirmationURL\s*\}\}",
+                    confirmLink);
+            }
+            else
+            {
+                subject = "Confirmez votre inscription";
+                htmlBody = $"<p>Bonjour {_displayName},</p><p><a href=\"{confirmLink}\">Confirmer mon adresse email</a> (lien valide 24 heures).</p>";
+            }
+
+            try
+            {
+                await EmailService.EnvoyerEmailAsync(_email, subject, htmlBody);
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[Register] Échec d'envoi de l'email de confirmation : {ex}");
+            }
+
+            _success = true;
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[Register] Erreur inattendue : {ex}");
+            _error = L["ChangePassword.Error"];
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+}

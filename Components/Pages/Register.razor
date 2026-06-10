@@ -1,9 +1,10 @@
 @page "/register"
 @inject IStringLocalizer<SharedResource> L
 @inject UserService UserService
-@inject TokenService TokenService
 @inject EmailService EmailService
 @inject EmailTemplateService TemplateService
+@inject CodeService CodeService
+@inject NavigationManager Nav
 @using DotNetEnv
 @using System.Text.RegularExpressions
 
@@ -30,20 +31,39 @@
 
             <form @onsubmit="SubmitAsync" @onsubmit:preventDefault>
                 <label class="pa-field-label">@L["Profile.DisplayName"]</label>
-                <input class="pa-input" type="text" @bind="_displayName" required autocomplete="name" />
+                <input class="pa-input" type="text" @bind="_displayName" required autocomplete="name" disabled="@_codeSent" />
 
                 <label class="pa-field-label">@L["Auth.Email"]</label>
-                <input class="pa-input" type="email" @bind="_email" required autocomplete="email" />
+                <input class="pa-input" type="email" @bind="_email" required autocomplete="email" disabled="@_codeSent" />
 
                 <label class="pa-field-label">@L["Auth.Password"]</label>
-                <input class="pa-input" type="password" @bind="_password" required autocomplete="new-password" />
+                <input class="pa-input" type="password" @bind="_password" required autocomplete="new-password" disabled="@_codeSent" />
 
                 <label class="pa-field-label">@L["Register.PasswordConfirm"]</label>
-                <input class="pa-input" type="password" @bind="_passwordConfirm" required autocomplete="new-password" />
+                <input class="pa-input" type="password" @bind="_passwordConfirm" required autocomplete="new-password" disabled="@_codeSent" />
 
-                <button class="pa-submit" type="submit" disabled="@_isLoading">
-                    @(_isLoading ? L["Common.Sending"] : L["Register.Submit"])
-                </button>
+                @if (!_codeSent)
+                {
+                    <button class="pa-submit" type="submit" disabled="@_isLoading">
+                        @(_isLoading ? L["Common.Sending"] : L["Code.GetCode"])
+                    </button>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2" Class="mt-4 mb-2" Style="opacity:.8;">
+                        @L["Register.CodeSentTo"] @_email
+                    </MudText>
+                    <label class="pa-field-label">@L["Code.Placeholder"]</label>
+                    <input class="pa-input" type="text" @bind="_codeInput" maxlength="6" autocomplete="one-time-code" />
+
+                    <button class="pa-submit" type="submit" disabled="@_isLoading">
+                        @(_isLoading ? L["Common.Sending"] : L["Code.Verify"])
+                    </button>
+
+                    <div class="mt-2">
+                        <MudLink @onclick="ResendAsync" Style="cursor:pointer;">@L["Code.Resend"]</MudLink>
+                    </div>
+                }
             </form>
 
             <div class="mt-4">
@@ -58,84 +78,156 @@
     private string _email = string.Empty;
     private string _password = string.Empty;
     private string _passwordConfirm = string.Empty;
+    private string _codeInput = string.Empty;
     private string? _error;
     private bool _success;
     private bool _isLoading;
+    private bool _codeSent;
 
     private async Task SubmitAsync()
     {
         _error = null;
         _isLoading = true;
 
+        try
+        {
+            if (!_codeSent)
+                await SendCodeAsync();
+            else
+                await ValidateCodeAsync();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private async Task SendCodeAsync()
+    {
         if (string.IsNullOrWhiteSpace(_displayName) || string.IsNullOrWhiteSpace(_email) ||
             string.IsNullOrWhiteSpace(_password) || string.IsNullOrWhiteSpace(_passwordConfirm))
         {
             _error = L["ChangePassword.FillAll"];
-            _isLoading = false;
             return;
         }
 
         if (_password != _passwordConfirm)
         {
             _error = L["ChangePassword.Mismatch"];
-            _isLoading = false;
+            return;
+        }
+
+        var exists = await UserService.EmailExistsAsync(_email);
+        if (exists)
+        {
+            _error = L["Register.EmailTaken"];
+            return;
+        }
+
+        var code = CodeService.GenerateCode(_email);
+        try
+        {
+            await EnvoyerCodeAsync(_email, code);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[Register] Échec envoi code : {ex.Message}");
+            _error = L["ChangePassword.Error"];
+            return;
+        }
+        _codeSent = true;
+    }
+
+    private async Task ValidateCodeAsync()
+    {
+        try
+        {
+            CodeService.CheckCode(_email, _codeInput);
+        }
+        catch (BusinessException ex)
+        {
+            _error = L[ex.Key];
             return;
         }
 
         try
         {
             var language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-            var userId = await UserService.RegisterAsync(_email, _password, _displayName, language);
+            await UserService.RegisterAsync(_email, _password, _displayName, language);
+        }
+        catch (BusinessException ex)
+        {
+            _error = L[ex.Key];
+            return;
+        }
 
-            if (userId is null)
-            {
-                _error = L["Register.EmailTaken"];
-                _isLoading = false;
-                return;
-            }
-
-            var token = await TokenService.GenererJetonsAsync(userId.Value, "confirm_signup", dureeHeures: 24);
-
-            var baseUrl = Env.GetString("BASE_URL", "http://localhost:5252").TrimEnd('/');
-            var confirmLink = $"{baseUrl}/confirm-email?token={token}";
-
-            var template = await TemplateService.GetAsync("confirm_signup", language);
-
-            string subject;
-            string htmlBody;
-            if (template != null)
-            {
-                subject = template.Subject;
-                htmlBody = Regex.Replace(
-                    template.Html,
-                    @"\{\{\s*\.?ConfirmationURL\s*\}\}",
-                    confirmLink);
-            }
-            else
-            {
-                subject = "Confirmez votre inscription";
-                htmlBody = $"<p>Bonjour {_displayName},</p><p><a href=\"{confirmLink}\">Confirmer mon adresse email</a> (lien valide 24 heures).</p>";
-            }
-
-            try
-            {
-                await EmailService.EnvoyerEmailAsync(_email, subject, htmlBody);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[Register] Échec d'envoi de l'email de confirmation : {ex}");
-            }
-
-            _success = true;
+        try
+        {
+            var language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            await EnvoyerBienvenueAsync(_email, _displayName, language);
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine($"[Register] Erreur inattendue : {ex}");
+            Console.Error.WriteLine($"[Register] Échec email bienvenue : {ex.Message}");
+        }
+
+        _success = true;
+    }
+
+    private async Task ResendAsync()
+    {
+        _error = null;
+        _codeInput = string.Empty;
+        var code = CodeService.GenerateCode(_email);
+        try
+        {
+            await EnvoyerCodeAsync(_email, code);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"[Register] Échec renvoi code : {ex.Message}");
             _error = L["ChangePassword.Error"];
         }
-        finally
+    }
+
+    private async Task EnvoyerBienvenueAsync(string email, string displayName, string language)
+    {
+        var template = await TemplateService.GetAsync("welcome", language);
+
+        string subject;
+        string htmlBody;
+        if (template != null)
         {
-            _isLoading = false;
+            subject = template.Subject;
+            htmlBody = Regex.Replace(template.Html, @"\{\{\s*\.?DisplayName\s*\}\}", displayName);
         }
+        else
+        {
+            subject = language == "en" ? "Welcome!" : (language == "es" ? "¡Bienvenido!" : "Bienvenue !");
+            htmlBody = $"<p>Bonjour <strong>{displayName}</strong>,</p><p>Votre compte a été créé avec succès. Bienvenue !</p>";
+        }
+
+        await EmailService.EnvoyerEmailAsync(email, subject, htmlBody);
+    }
+
+    private async Task EnvoyerCodeAsync(string email, string code)
+    {
+        var language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        var template = await TemplateService.GetAsync("confirm_signup", language);
+
+        string subject;
+        string htmlBody;
+        if (template != null)
+        {
+            subject = template.Subject;
+            htmlBody = Regex.Replace(template.Html, @"\{\{\s*\.?Code\s*\}\}", code);
+        }
+        else
+        {
+            subject = "Votre code de confirmation";
+            htmlBody = $"<p>Votre code de confirmation : <strong>{code}</strong> (valable 20 minutes).</p>";
+        }
+
+        await EmailService.EnvoyerEmailAsync(email, subject, htmlBody);
     }
 }

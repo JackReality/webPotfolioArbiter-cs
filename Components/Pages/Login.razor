@@ -12,7 +12,11 @@
 
         @* L'erreur s'affiche ICI, sur place, sans recharger la page (_error rempli
            par la validation interactive). ErrorFlag = repli si l'endpoint redirige. *@
-        @if (!string.IsNullOrEmpty(_error) || ErrorFlag == 1)
+        @if (!string.IsNullOrEmpty(_error))
+        {
+            <MudAlert Severity="@_alertSeverity" Class="mb-4">@_error</MudAlert>
+        }
+        else if (ErrorFlag == 1)
         {
             <MudAlert Severity="Severity.Error" Class="mb-4">@L["Auth.Error"]</MudAlert>
         }
@@ -49,27 +53,22 @@
     [SupplyParameterFromQuery(Name = "error")] public int? ErrorFlag { get; set; }
 
     private string? _error;
+    private Severity _alertSeverity = Severity.Error;
 
     private async Task SubmitAsync()
     {
         _error = null;
+        _alertSeverity = Severity.Error;
 
-        // On lit la valeur RÉELLE des champs dans le DOM (robuste à l'autofill du
-        // navigateur, qui ne déclenche pas toujours les événements de binding).
         var email = await JS.InvokeAsync<string>("getInputValue", "login-email");
         var password = await JS.InvokeAsync<string>("getInputValue", "login-password");
 
-        // Validation interactive AVANT tout POST : si les identifiants sont mauvais,
-        // on se contente d'afficher l'erreur (aucun rechargement / redirection).
-        var user = await Auth.VerifierIdentifiantsAsync(email ?? "", password ?? "");
-        if (user is null)
+        var result = await Auth.VerifierIdentifiantsAsync(email ?? "", password ?? "");
+        if (result.Status == LoginStatus.InvalidCredentials)
         {
             _error = L["Auth.Error"];
             return;
         }
-
-        // Identifiants valides → on poste réellement le formulaire pour que
-        // l'endpoint /auth/login pose le cookie d'authentification (HttpContext requis).
         await JS.InvokeVoidAsync("submitForm", "login-form");
     }
 }

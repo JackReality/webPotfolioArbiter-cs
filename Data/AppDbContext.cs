@@ -24,9 +24,6 @@ public class AppDbContext : DbContext
     // Les templates d'emails (multilingues : 1 ligne = 1 type + 1 langue).
     public DbSet<EmailTemplate> EmailTemplates => Set<EmailTemplate>();
 
-    // Les jetons temporaires (confirmation, réinitialisation de mot de passe).
-    public DbSet<EmailToken> EmailTokens => Set<EmailToken>();
-
     // Les formations vendues sur le site (table "trainings").
     public DbSet<Training> Trainings => Set<Training>();
 }

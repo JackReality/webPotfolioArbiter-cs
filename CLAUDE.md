@@ -9,6 +9,7 @@ Blazor Web App (.NET 10) · InteractiveServer · MudBlazor · MySQL (EF Core Pom
 3. Pas de migrations EF — tables créées en SQL à la main, puis mappées
 4. Pages en fichier unique `.razor` (markup + `@code`, pas de code-behind)
 5. Logique dans `Services/` injectés — une page n'appelle jamais le `DbContext`
+5b. Toute méthode `public` d'un service peut être appelée par une page. Elle lance `BusinessException("clé.i18n")` pour les erreurs métier prévues ; la page attrape `BusinessException` et affiche `L[ex.Key]`. Toute autre exception remonte à `ErrorBoundary`.
 6. MudBlazor en priorité
 7. Répondre en français · expliquer simplement (débutant C#)
 

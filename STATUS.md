@@ -1,152 +1,145 @@
 # État du projet — Portfolio Arbiter
 
-> **Règle de structure de ce fichier** : 7 chapitres maximum.
-> 1. "À faire"
-> 2 à 7. "Fait le [YYYY-MM-DD]" (le plus ancien est supprimé quand un nouveau est ajouté).
+Règle : 7 sections maximum. Section 1 = À faire. Sections 2-7 = Fait le YYYY-MM-DD (la plus ancienne est supprimée quand une nouvelle est ajoutée).
 
 ---
 
 ## 1. À faire
 
-### 🟢 Lot « Achat (Stripe) » — squelette, 1 sous-étape à la fois
+### Stripe — paiement
 
-> Décisions actées : **squelette seulement** (clés en placeholders dans `.env`, à remplir
-> plus tard) ; montée en rôle `subscriber → client` par **vérification au retour** sur
-> `/stripe-ok` (le serveur interroge Stripe pour confirmer le paiement). Un `admin` reste `admin`.
-> ⚠️ Non testable tant que les vraies clés Stripe ne sont pas dans `.env`.
+Principe : le rôle passe de `subscriber` à `client` uniquement après vérification serveur que Stripe a bien encaissé le paiement.
 
-- [ ] **Étape 1 — Préparer le terrain.** Package `Stripe.net` (`.csproj`) + placeholders `STRIPE_SECRET_KEY` dans `.env` + `StripeService` (création d'une session Stripe Checkout à partir de `training.StripePriceId`, `success_url`=`/stripe-ok?session_id=...`, `cancel_url`=`/stripe-error`). *(rien de visible encore)*
-- [ ] **Étape 2 — Brancher le bouton « Acheter »** du catalogue : si non connecté → `/login` ; sinon créer la session et rediriger vers l'URL Stripe (`NavigateTo(url, forceLoad:true)`).
-- [ ] **Étape 3 — Pages de retour** : `/stripe-ok` (vérifie via Stripe que la session est payée, puis monte le rôle `subscriber → client`) et `/stripe-error` (paiement annulé/échoué).
-- [ ] **Étape 4 — Email de confirmation** après achat, via `training.ConfirmationEmailHtml` (envoyé par `EmailService`).
+Tâches Jack :
+- [ ] Mettre la vraie clé live dans `.env` : `STRIPE_SECRET_KEY=sk_live_...`
+- [ ] Dans le dashboard Stripe, créer un webhook pointant vers `https://portfolioarbiter.com/stripe/webhook`, événement `checkout.session.completed`, puis copier la clé `whsec_...` dans `.env` : `STRIPE_WEBHOOK_SECRET=whsec_...` *(pour étape 3)*
 
-### 🔵 Auth — étape 2 (prioritaire)
-- [x] **Inscription** (`/register`) + confirmation email (`/confirm-email`) + lien « S'inscrire » dans le header.
-- [ ] Bloquer la connexion si `email_confirmed = 0` (au choix).
-- [ ] Page **profil** (`/profile`) : il reste la **photo** (changement pseudo/langue/mot de passe déjà faits).
+Tâches Claude :
+- [x] Étape 1 — Terrain : package `Stripe.net`, placeholders `.env`, `StripeService.CreateCheckoutSessionAsync`
+- [ ] Étape 2 — Bouton Acheter dans le catalogue : non connecté → `/login`, connecté → session Stripe → redirect
+- [ ] Étape 3 — Pages de retour : `/stripe-ok` (vérifie paiement via Stripe, monte le rôle) + `/stripe-error`
+- [ ] Étape 4 — Email de confirmation après achat via `training.ConfirmationEmailHtml`
 
-### 🔧 Revue — restes à corriger
-- [ ] `EmailService` : remplacer `SecureSocketOptions.Auto` par un mapping explicite (`465 → SslOnConnect`, `587 → StartTls`). *(actuellement `Auto` — choix volontairement gardé, voir Fait 06-08)*
-- [ ] `TokenService` : pas de nettoyage des jetons expirés ; une nouvelle demande n'invalide pas les précédents (plusieurs liens valides en parallèle).
-- [ ] `Profile` : après sauvegarde du pseudo, le claim `Name` du cookie reste périmé jusqu'à reconnexion (nom du header non rafraîchi).
+### Pages de contenu
 
-### 📄 Contenu des pages
-- [ ] **Download** (`/download`) : bouton de copie de la Google Sheet (accès selon rôle).
-- [ ] **Training** (`/training`) : présentation + achat (passe le rôle à `client`).
-- [ ] **Client area** (`/client-area`) : contenu réservé aux clients.
+- [ ] `/download` : bouton de copie de la Google Sheet selon le rôle
+- [ ] `/training` : présentation de la formation + bouton achat
+- [ ] `/client-area` : contenu réservé aux clients
 
-### 🏗️ Métier (cœur du site)
-- [ ] **Achat de formation** → paiement (Stripe) → passage du rôle à `client`. *(voir lot Stripe)*
-- [ ] **Forum** des visiteurs/clients.
+### Admin
 
-### 🛠️ Admin
-- [x] **Modifier une formation** (`/admin/trainings`) : édition via `_editingId` + `TrainingService.UpdateAsync`.
-- [ ] Gestion des rôles utilisateurs (la **liste + suppression** est faite, voir Fait 06-08).
-- [ ] Éditeur des `email_templates` (FR/EN/ES) — *partiellement fait, à finaliser*.
+- [ ] Gestion des rôles utilisateurs (liste et suppression déjà faites, manque la modification)
+- [ ] Finaliser l'éditeur des templates d'emails (FR/EN/ES)
 
-### 🔩 Divers & Technique
-- [ ] **Notifier si erreur** : créer un code global `mailErrorSend()` et l'intégrer dans `Program.cs` (gestion d'erreur) et `MainLayout`.
-- [ ] **Jack-PromptInitProjet** : ajouter la demande d'intégrer le login selon ce qui est fait actuellement.
-- [ ] Décider du sort de la table `schema_migrations` (laissée pour l'instant, supprimable).
-- [ ] Remplir l'email de contact réel dans les Mentions (actuellement `contact@realityexplorer.com`).
+### Divers
+
+- [ ] Remplir l'email de contact dans les Mentions légales (actuellement `contact@realityexplorer.com`)
+- [ ] Décider du sort de la table `schema_migrations` (supprimable)
+- [ ] `EmailService` : mapping SSL explicite `465 → SslOnConnect` / `587 → StartTls` (optionnel, `Auto` fonctionne)
 
 ---
 
-## 2. Fait le 2026-06-08
+## 2. Fait le 2026-06-10
 
-### Doc & conventions (tout en anglais)
-- [x] **Doc remaniée.** `CLAUDE.md` 180→66 l. + annexes `ARCHITECTURE.md`, `AUTH.md`, `I18N.md` ; accès CLI DB + schéma dans `database.md` (ex-`BASE_DE_DONNEES.md`) ; workflow détaillé dans `PROCESSUS_TRAVAIL.md`. Convention (tout en anglais, colonne `language`) + règle `watch` gravées. Convention de nommage des pages documentée dans `database.md`.
+### Stripe — étape 1
 
-### Renommage anglais : table, pages, clés i18n
-- [x] **Table `trainings`** (ex-`formations`) + colonne `language` : modèle `Training`, `TrainingService` (`GetByLanguageAsync`), `DbSet Trainings`, route `/admin/trainings`, sélecteur de langue dans l'admin + colonne « Langue », **catalogue filtré sur la langue courante**.
-- [x] **`email_templates.lang` → `language`** (DB + `EmailTemplate.Language` + `EmailTemplateService` + `LanguageTabs.razor`).
-- [x] **Routes + fichiers `.razor` en anglais** : `/profil`→`/profile`, `/telecharger`→`/download` (`Download.razor`), `/formation`→`/training` (`Training.razor`), `/catalogue`→`/catalog`, `/espace-client`→`/client-area` (`ClientArea.razor`), `/acces-reserve`→`/access-denied` (`AccessDenied.razor`), `/reset`→`/forgot-password` (`ForgotPassword.razor`). Répercuté partout (`Program.cs`, `MainLayout`, `Routes.razor`, liens). **Vérifié** : nouvelles routes 302/200, anciennes 404.
-- [x] **Clés i18n en anglais** (3 `.resx` + usages) : `Nav.Home/Download/Training/Login`, `Download.Title`, `Training.Title`, `AccessDenied.*`, `ForgotPassword.*`, `Legal.Terms.*`/`Legal.Tab.Terms`, `Legal.LegalNotice.*`/`Legal.Tab.LegalNotice`, + nouvelle clé `ClientArea.Title` (titre auparavant en dur). Valeurs/traductions inchangées → zéro impact visuel.
+- [x] Package `Stripe.net 52.0.0` ajouté au projet
+- [x] Placeholders `STRIPE_SECRET_KEY` et `STRIPE_WEBHOOK_SECRET` dans `.env`
+- [x] `StripeService` : `CreateCheckoutSessionAsync(training, userId, successUrl, cancelUrl)` → URL Stripe. Lance `BusinessException("Stripe.NotConfigured")` si `stripe_price_id` absent.
+- [x] Clé i18n `Stripe.NotConfigured` (FR/EN/ES)
 
-### Langue, login, mot de passe
-- [x] **Langue au login** : `/auth/login` pose le cookie de langue depuis `user.Language`.
-- [x] **Sélecteur FR/EN/ES fiable** : clic intercepté (`@onclick:preventDefault` + `SetCulture` → `NavigateTo(url, forceLoad:true)`) → changement systématique.
-- [x] **Page mot de passe : une seule route** `/reset-password` (2ᵉ route retirée ; lien profil re-pointé).
-- [x] **Bouton « Admin Dashboard »** du profil : déjà en `Color.Warning` (ambre), visible admins seulement. Conservé.
-- [x] **Login : erreur sans rechargement.** Validation C# d'abord (`AuthService`) ; mauvais identifiants → message sur place ; bons identifiants → vrai POST (JS `submitForm`) pour poser le cookie.
+### Auth — refonte complète codes 6 chiffres
 
-### Admin, utilisateurs, catalogue
-- [x] **`/admin/users`** (`AdminUsers.razor`) : liste (email, nom, rôle, langue, date) + **Supprimer** (sauf admin, côté UI + serveur). Bouton ajouté au dashboard.
-- [x] **Cascade de suppression user vérifiée** : seule FK `email_tokens.user_id → users.id` en `ON DELETE CASCADE` → suppression propre. `email_templates`/`trainings` globaux. Doc : `database.md`.
-- [x] **`/admin/trainings`** (`AdminTraining.razor`) : liste + ajout + suppression.
-- [x] **`/catalog`** (`Catalog.razor`, publique) : formations (titre + HTML) séparées par `MudDivider`, boutons « Acheter » (message « Stripe à configurer »).
-
-### Revue du commit `c30d584` (corrections)
-- [x] Templates d'emails admin branchés sur le mail réel (`ForgotPassword.razor` lit le template `recovery`, repli FR + repli HTML minimal).
-- [x] Pages admin protégées par `@attribute [Authorize(Roles = "admin")]`.
-- [x] Bug `LanguageTabs` (texte qui revenait) : `@bind` direct sur l'objet en mémoire.
-- [x] Erreur SMTP brute **non révélée** à l'utilisateur (loggée serveur, succès générique anti-énumération).
-- [x] `Console.WriteLine` de debug retirés (`UserService.ChangerMotDePasseAsync`).
-- [x] Langue du profil appliquée (option A : `/Culture/Set` + forceLoad, message via `?saved=1`).
-- [x] `AdminEmailTemplates` : spinner infini si table vide corrigé (flag `_loaded`).
-- ~~`EmailService` : `Auto` → mapping SSL explicite.~~ **Abandonné** : le port vient du `.env` et `Auto` choisit le bon mode → adapté. *(une variante « mapping explicite » reste listée en À faire, optionnelle.)*
-
-### Auth étape 2 : Changement de mot de passe et réinitialisation
-- [x] Modèle `EmailToken` et `AppDbContext` configurés.
-- [x] `TokenService` (générer / valider / supprimer les jetons ; isolation des scopes Blazor via `IServiceScopeFactory`).
-- [x] Page unique `ResetPassword.razor` (flux « Profil » + « Oubli »), simplifiée (ne demande plus l'ancien mot de passe).
-- [x] Validation stricte (MudBlazor `MudForm`/`MudTextField`/`MudButton`).
-- [x] `ForgotPassword.razor` : demande l'email, génère le jeton, envoie le lien via `EmailService`.
-- [x] `EmailService` (MailKit) configuré avec `.env` (Infomaniak, port 465, `BASE_URL`, `MAIL_FROM`).
+- [x] `BusinessException` pattern : services lancent les erreurs métier, pages catchent uniquement `BusinessException`, le reste remonte à `ErrorBoundary`. Règle ajoutée dans `CLAUDE.md` (5b).
+- [x] `CodeService` (singleton) : code 6 chiffres en mémoire, expiration 20 min, max 5 tentatives
+- [x] Inscription `/register` : code envoyé avant création du compte, user créé en DB seulement après validation du code
+- [x] Email de bienvenue envoyé après inscription via template `welcome`
+- [x] Mot de passe oublié `/forgot-password` : flux code 6 chiffres, anti-énumération préservé
+- [x] Changement de mot de passe `/reset-password` : code envoyé à l'email courant
+- [x] Changement d'email `/profile` : code envoyé au nouvel email, changement en DB après validation
+- [x] Colonne `email_confirmed` supprimée de la DB, du modèle `User` et de `AuthService`
+- [x] `TokenService`, `EmailToken`, `ConfirmEmail.razor` supprimés. Table `email_tokens` supprimée.
+- [x] Templates emails : `{{ .ConfirmationURL }}` remplacé par `{{ .Code }}` (HTML FR/EN/ES fourni)
+- [x] Bug ResetPassword (double-render Blazor) : corrigé avec `OnAfterRenderAsync(firstRender)`
+- [x] Bug logout "Not Found" : `MapGet("/auth/logout")` ajouté
+- [x] Bug Register figé sur erreur SMTP : exception catchée, circuit Blazor préservé
+- [x] Validation métier (longueur mot de passe, email déjà pris) centralisée dans `UserService`
 
 ---
 
-## 3. Fait le 2026-06-07
+## 3. Fait le 2026-06-09
 
-### Authentification & accès (étape 1)
-- [x] Auth par cookie officiel ASP.NET Core sur la table `users` (bcrypt via BCrypt.Net-Next).
-- [x] 3 niveaux par attribut : public / `[Authorize]` / `[Authorize(Roles="client,admin")]`.
-- [x] Endpoints `/auth/login` et `/auth/logout`. Header dynamique.
-- [x] Compte de test : `facebook@grillet.ch` / `Test1234!` (subscriber) · `jack@grillet.ch` (admin).
+### Édition des formations
 
-### Gestion des utilisateurs (CRUD)
-- [x] `Services/UserService.cs` créé et enregistré dans `Program.cs`.
-- [x] Méthodes : `GetByIdAsync`, `GetByEmailAsync`, `CreerAsync` (hache bcrypt), `ChangerMotDePasseAsync`, `SauvegarderProfilAsync`.
+- [x] `TrainingService.UpdateAsync` : mise à jour des 6 champs
+- [x] Bouton édition par ligne dans `AdminTraining.razor` + snackbar confirmation
 
----
+### Contact et catalogue
 
-## 4. Fait le 2026-06-06
+- [x] Page `/contact` : formulaire nom/email/message, envoi via `EmailService`, i18n FR/EN/ES
+- [x] Menu Formation et CTA AccessDenied redirigés vers `/catalog`
+- [x] Catalogue : message + bouton Contact si aucune formation
 
-### Socle & conventions
-- [x] Architecture Blazor Server, projet unique, MudBlazor, EF Core + Pomelo (MySQL).
-- [x] Gestion d'erreurs centralisée : `UseExceptionHandler("/Error")` + `<ErrorBoundary>` global dans `MainLayout`.
-- [x] Secrets dans `.env` (DotNetEnv). `DB_HOST=127.0.0.1` obligatoire. Base = `portfolio_arbiter`.
+### Inscription (base, refondue le 06-10)
 
-### Multilingue (FR / EN / ES)
-- [x] `IStringLocalizer<SharedResource>` + `.resx` (FR par défaut/repli, EN + ES remplis).
-- [x] Sélecteur de langue dans le header (cookie + rechargement), `<html lang>` dynamique.
-
-### Pages de base
-- [x] Accueil (`/`) : 6 sections façon maquette.
-- [x] Légal (`/legal`) : 3 onglets (CGV, Confidentialité, Mentions). Email de contact anti-robots.
-- [x] Pages vierges créées (depuis renommées en anglais — voir Fait 06-08).
+- [x] `UserService.RegisterAsync` + page `/register` + email `confirm_signup` via template
+- [x] Page `/confirm-email?token=` : validation jeton, `email_confirmed=1`
+- [x] Lien S'inscrire dans le header, clés i18n FR/EN/ES
 
 ---
 
-## 5. Fait le 2026-06-09
+## 4. Fait le 2026-06-08
 
-### Lot « Édition formation »
-- [x] `TrainingService.UpdateAsync` : met à jour les 6 champs, garde `CreatedAt`.
-- [x] Bouton ✏️ par ligne dans `AdminTraining.razor` → mode édition (`_editingId`) + snackbar « Formation modifiée. »
+### Documentation et conventions
 
-### Lot « Contact + Catalog »
-- [x] Page `/contact` (`Contact.razor`) : formulaire nom/email/message, envoi via `EmailService`, clés i18n `Contact.*` (FR/EN/ES), lien au menu.
-- [x] Menu « Formation » et CTA `AccessDenied` redirigés vers `/catalog`.
-- [x] Catalog : état vide remplacé par message + bouton `/contact` (`Catalog.Empty`).
+- [x] `CLAUDE.md` réduit + annexes `ARCHITECTURE.md`, `AUTH.md`, `I18N.md`, `database.md`, `PROCESSUS_TRAVAIL.md`
+- [x] Convention tout en anglais, colonne `language`, règle `dotnet watch` documentées
 
-### Auth étape 2 — Inscription
-- [x] `UserService.RegisterAsync` (vérifie email, crée user bcrypt, `email_confirmed=0`) + `ConfirmEmailAsync`.
-- [x] Page `/register` : formulaire + envoi email `confirm_signup` via template MySQL (placeholder `{{ .ConfirmationURL }}`), lien de confirmation valide 24h.
-- [x] Page `/confirm-email?token=` : valide le jeton, met `email_confirmed=1`, supprime le token.
-- [x] Lien « S'inscrire » (`Nav.Register`) dans le header (visible si non connecté). Clés i18n FR/EN/ES.
+### Renommage anglais
 
-## 6. Fait le [À venir]
-*(Aucun historique supplémentaire pour le moment)*
+- [x] Table `trainings` (ex `formations`), colonne `language`, modèle et service mis à jour
+- [x] `email_templates.lang` → `language` partout
+- [x] Routes et fichiers `.razor` en anglais : `/profile`, `/download`, `/training`, `/catalog`, `/client-area`, `/access-denied`, `/forgot-password`
+- [x] Clés i18n en anglais dans les 3 fichiers `.resx`
 
-## 7. Fait le [À venir]
-*(Aucun historique supplémentaire pour le moment)*
+### Login et langue
+
+- [x] Cookie de langue posé au login depuis `user.Language`
+- [x] Sélecteur FR/EN/ES fiable via `NavigateTo(url, forceLoad:true)`
+- [x] Login : validation C# en premier, erreur affichée sur place, vrai POST seulement si identifiants corrects
+
+### Admin et utilisateurs
+
+- [x] `/admin/users` : liste + suppression (sauf admin)
+- [x] `/admin/trainings` : liste + ajout + suppression
+- [x] `/catalog` : formations par langue + boutons Acheter
+
+---
+
+## 5. Fait le 2026-06-07
+
+### Authentification
+
+- [x] Auth cookie ASP.NET Core sur la table `users`, bcrypt
+- [x] 3 niveaux d'accès : public, `[Authorize]`, `[Authorize(Roles="client,admin")]`
+- [x] Endpoints `/auth/login` et `/auth/logout`, header dynamique
+
+### Gestion des utilisateurs
+
+- [x] `UserService` : `GetByIdAsync`, `GetByEmailAsync`, `CreerAsync`, `ChangerMotDePasseAsync`, `SauvegarderProfilAsync`
+
+---
+
+## 6. Fait le 2026-06-06
+
+### Socle
+
+- [x] Blazor Server, MudBlazor, EF Core + Pomelo MySQL
+- [x] `UseExceptionHandler` + `ErrorBoundary` global
+- [x] Secrets dans `.env` via DotNetEnv
+
+### Multilingue et pages de base
+
+- [x] `IStringLocalizer<SharedResource>` + `.resx` FR/EN/ES
+- [x] Sélecteur de langue dans le header
+- [x] Pages : accueil, légal (CGV / Confidentialité / Mentions)

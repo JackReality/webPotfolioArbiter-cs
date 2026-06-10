@@ -33,9 +33,6 @@ public class User
     [Column("role")]
     public string Role { get; set; } = "subscriber";
 
-    [Column("email_confirmed")]
-    public bool EmailConfirmed { get; set; }
-
     [Column("created_at")]
     public DateTime CreatedAt { get; set; }
 }

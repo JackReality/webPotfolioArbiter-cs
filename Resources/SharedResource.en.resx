@@ -236,13 +236,15 @@ Switzerland</value></data>
   <data name="Auth.ForgotPassword" xml:space="preserve"><value>Forgot password?</value></data>
   <data name="Auth.CreateAccount" xml:space="preserve"><value>Create an account</value></data>
   <data name="Auth.Error" xml:space="preserve"><value>Incorrect email or password.</value></data>
+  <data name="Login.EmailNotConfirmed" xml:space="preserve"><value>Please confirm your email address before signing in.</value></data>
   <data name="Register.Title" xml:space="preserve"><value>Create an account</value></data>
   <data name="Register.Subtitle" xml:space="preserve"><value>Fill in the form to create your account.</value></data>
   <data name="Register.PasswordConfirm" xml:space="preserve"><value>Confirm password</value></data>
   <data name="Register.Submit" xml:space="preserve"><value>Sign up</value></data>
-  <data name="Register.SuccessMessage" xml:space="preserve"><value>A confirmation email has been sent to your address. Check your inbox.</value></data>
+  <data name="Register.SuccessMessage" xml:space="preserve"><value>Welcome! A welcome email has been sent to you. You can now sign in.</value></data>
   <data name="Register.EmailTaken" xml:space="preserve"><value>This email address is already in use.</value></data>
   <data name="Register.AlreadyHaveAccount" xml:space="preserve"><value>Already have an account? Sign in</value></data>
+  <data name="Register.CodeSentTo" xml:space="preserve"><value>Code sent to</value></data>
   <data name="ConfirmEmail.Title" xml:space="preserve"><value>Email confirmation</value></data>
   <data name="ConfirmEmail.Success" xml:space="preserve"><value>Your email address has been confirmed. You can now sign in.</value></data>
   <data name="ConfirmEmail.InvalidToken" xml:space="preserve"><value>This confirmation link is invalid or has expired. Please sign up again.</value></data>
@@ -262,6 +264,10 @@ Switzerland</value></data>
   <data name="Profile.Language" xml:space="preserve"><value>Language</value></data>
   <data name="Profile.Save" xml:space="preserve"><value>Save</value></data>
   <data name="Profile.ChangePassword" xml:space="preserve"><value>Change password</value></data>
+  <data name="Profile.ChangeEmail" xml:space="preserve"><value>Change email</value></data>
+  <data name="Profile.NewEmail" xml:space="preserve"><value>New email</value></data>
+  <data name="Profile.EmailChangeWarning" xml:space="preserve"><value>You will be logged out — a confirmation email will be sent to your new address.</value></data>
+  <data name="Profile.EmailChanged" xml:space="preserve"><value>Email updated. You will be logged out.</value></data>
 
   <!-- ===== Password change ===== -->
   <data name="ChangePassword.Title" xml:space="preserve"><value>Change password</value></data>
@@ -276,6 +282,17 @@ Switzerland</value></data>
   <data name="ChangePassword.TooShort" xml:space="preserve"><value>Password must be at least 6 characters.</value></data>
   <data name="ChangePassword.WrongCurrent" xml:space="preserve"><value>The current password is incorrect.</value></data>
   <data name="ChangePassword.Error" xml:space="preserve"><value>Error changing password.</value></data>
+  <data name="ChangePassword.ProfileSubtitle" xml:space="preserve"><value>A verification code will be sent to your email address.</value></data>
+
+  <!-- ===== Verification code ===== -->
+  <data name="Code.NotFound" xml:space="preserve"><value>No pending code. Please request a new one.</value></data>
+  <data name="Code.Expired" xml:space="preserve"><value>The code has expired. Please request a new one.</value></data>
+  <data name="Code.Invalid" xml:space="preserve"><value>Incorrect code.</value></data>
+  <data name="Code.MaxAttempts" xml:space="preserve"><value>Too many incorrect attempts. Please request a new code.</value></data>
+  <data name="Code.GetCode" xml:space="preserve"><value>Get code</value></data>
+  <data name="Code.Resend" xml:space="preserve"><value>Resend code</value></data>
+  <data name="Code.Placeholder" xml:space="preserve"><value>6-digit code</value></data>
+  <data name="Code.Verify" xml:space="preserve"><value>Verify</value></data>
 
   <!-- ===== Common ===== -->
   <data name="Common.Back" xml:space="preserve"><value>Back</value></data>
@@ -297,4 +314,6 @@ Switzerland</value></data>
   <data name="Contact.InvalidEmail" xml:space="preserve"><value>Please enter a valid email address.</value></data>
   <!-- ===== Catalog ===== -->
   <data name="Catalog.Empty" xml:space="preserve"><value>No training available yet, but send us a request and we'll get back to you.</value></data>
+  <!-- ===== Stripe ===== -->
+  <data name="Stripe.NotConfigured" xml:space="preserve"><value>Payment is not yet configured for this training.</value></data>
 </root>

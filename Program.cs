@@ -62,9 +62,10 @@ builder.Services.AddScoped<ExempleService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<EmailTemplateService>();
-builder.Services.AddScoped<TokenService>();
+builder.Services.AddSingleton<CodeService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TrainingService>();
+builder.Services.AddScoped<StripeService>();
 
 var app = builder.Build();
 
@@ -121,16 +122,17 @@ app.MapPost("/auth/login", async (
     HttpContext ctx, AuthService auth,
     [FromForm] string email, [FromForm] string password, [FromForm] string? returnUrl) =>
 {
-    var user = await auth.VerifierIdentifiantsAsync(email ?? "", password ?? "");
-    if (user is null)
+    var result = await auth.VerifierIdentifiantsAsync(email ?? "", password ?? "");
+    if (result.Status != LoginStatus.Success)
         return Results.LocalRedirect($"/login?error=1&returnUrl={Uri.EscapeDataString(returnUrl ?? "/")}");
 
+    var user = result.User!;
     var claims = new List<Claim>
     {
         new(ClaimTypes.NameIdentifier, user.Id.ToString()),
         new(ClaimTypes.Name, user.DisplayName),
         new(ClaimTypes.Email, user.Email),
-        new(ClaimTypes.Role, user.Role),   // <- pilote [Authorize(Roles=...)]
+        new(ClaimTypes.Role, user.Role),
     };
     var principal = new ClaimsPrincipal(
         new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
@@ -155,6 +157,48 @@ app.MapPost("/auth/logout", async (HttpContext ctx) =>
     await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
     return Results.LocalRedirect("/");
 });
+
+app.MapGet("/auth/logout", async (HttpContext ctx) =>
+{
+    await ctx.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+    return Results.LocalRedirect("/");
+});
+
+// Rafraîchit les claims du cookie (ex : DisplayName après modif profil) et
+// pose le cookie de langue si `culture` est fourni, puis redirige vers `returnUrl`.
+app.MapGet("/auth/refresh-claims", async (
+    HttpContext ctx, UserService users,
+    [FromQuery] string? culture, [FromQuery] string? returnUrl) =>
+{
+    var idClaim = ctx.User.FindFirst(ClaimTypes.NameIdentifier);
+    if (idClaim == null || !ulong.TryParse(idClaim.Value, out var userId))
+        return Results.LocalRedirect(returnUrl ?? "/");
+
+    var user = await users.GetByIdAsync(userId);
+    if (user == null)
+        return Results.LocalRedirect(returnUrl ?? "/");
+
+    var claims = new List<Claim>
+    {
+        new(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new(ClaimTypes.Name, user.DisplayName),
+        new(ClaimTypes.Email, user.Email),
+        new(ClaimTypes.Role, user.Role),
+    };
+    var principal = new ClaimsPrincipal(
+        new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+    await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+    if (!string.IsNullOrEmpty(culture) && languesSupportees.Contains(culture))
+    {
+        ctx.Response.Cookies.Append(
+            CookieRequestCultureProvider.DefaultCookieName,
+            CookieRequestCultureProvider.MakeCookieValue(
+                new RequestCulture(culture, culture)));
+    }
+
+    return Results.LocalRedirect(returnUrl ?? "/");
+}).RequireAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();

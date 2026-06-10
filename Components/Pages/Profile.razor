@@ -2,8 +2,12 @@
 @attribute [Authorize]
 @inject IStringLocalizer<SharedResource> L
 @inject UserService UserService
+@inject EmailService EmailService
+@inject EmailTemplateService TemplateService
+@inject CodeService CodeService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
+@using System.Text.RegularExpressions
 
 <PageTitle>@L["Profile.Title"]</PageTitle>
 
@@ -28,17 +32,13 @@
         @if (_user is not null)
         {
             <form>
-                @* ===== Avatar (picto par défaut — URL de photo à venir) ===== *@
+                @* ===== Avatar ===== *@
                 <MudText Typo="Typo.subtitle1" Class="mb-2">@L["Profile.Avatar"]</MudText>
                 <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Style="font-size:64px; color:#888;" Class="mb-4" />
 
                 @* ===== Nom affiché ===== *@
                 <label class="pa-field-label">@L["Profile.DisplayName"]</label>
                 <input class="pa-input" @bind="_user.DisplayName" required />
-
-                @* ===== Email — lecture seule (confirmation mail requise pour le modifier) ===== *@
-                <label class="pa-field-label">@L["Auth.Email"]</label>
-                <MudText>@_user.Email</MudText>
 
                 @* ===== Langue ===== *@
                 <label class="pa-field-label">@L["Profile.Language"]</label>
@@ -48,7 +48,7 @@
                     <MudSelectItem Value="@("es")">Español</MudSelectItem>
                 </MudSelect>
 
-                @* ===== Boutons ===== *@
+                @* ===== Boutons principaux ===== *@
                 <div class="d-flex justify-space-between mt-6" style="gap:12px;">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SaveAsync">
                         @L["Profile.Save"]
@@ -57,6 +57,50 @@
                         @L["Profile.ChangePassword"]
                     </MudButton>
                 </div>
+
+                @* ===== Changement d'email ===== *@
+                <MudDivider Class="mt-6 mb-4" />
+                <MudText Typo="Typo.body2" Class="mb-3" Style="opacity:.8;">@L["Auth.Email"] : @_user.Email</MudText>
+
+                @if (!string.IsNullOrEmpty(_emailError))
+                {
+                    <MudAlert Severity="Severity.Error" Class="mb-2">@_emailError</MudAlert>
+                }
+                @if (_emailSuccess)
+                {
+                    <MudAlert Severity="Severity.Success" Class="mb-2">@L["Profile.EmailChanged"]</MudAlert>
+                }
+
+                @if (!_emailCodeSent)
+                {
+                    <label class="pa-field-label">@L["Profile.ChangeEmail"]</label>
+                    <input class="pa-input" type="email" @bind="_newEmail" placeholder="@L["Profile.NewEmail"]" autocomplete="email" />
+                    <MudButton Variant="Variant.Outlined" Color="Color.Info"
+                               OnClick="SendEmailCodeAsync"
+                               Disabled="@_emailChanging"
+                               FullWidth="true" Class="mt-2">
+                        @(_emailChanging ? L["Common.Sending"] : L["Code.GetCode"])
+                    </MudButton>
+                }
+                else
+                {
+                    <MudText Typo="Typo.body2" Class="mb-2" Style="opacity:.8;">@L["Register.CodeSentTo"] @_newEmail</MudText>
+                    <label class="pa-field-label">@L["Code.Placeholder"]</label>
+                    <input class="pa-input" type="text" @bind="_emailCodeInput" maxlength="6" autocomplete="one-time-code" />
+                    <div class="d-flex mt-2" style="gap:8px;">
+                        <MudButton Variant="Variant.Filled" Color="Color.Info"
+                                   OnClick="ValidateEmailCodeAsync"
+                                   Disabled="@_emailChanging"
+                                   FullWidth="true">
+                            @(_emailChanging ? L["Common.Sending"] : L["Code.Verify"])
+                        </MudButton>
+                        <MudButton Variant="Variant.Outlined" Color="Color.Default"
+                                   OnClick="SendEmailCodeAsync"
+                                   Disabled="@_emailChanging">
+                            @L["Code.Resend"]
+                        </MudButton>
+                    </div>
+                }
 
                 @* ===== Bouton Admin (visible uniquement pour les admins) ===== *@
                 @if (_isAdmin)
@@ -76,14 +120,18 @@
 </div>
 
 @code {
-    // ?saved=1 dans l'URL : on revient ici après le rechargement déclenché par
-    // le changement de langue, pour réafficher le message de succès.
     [SupplyParameterFromQuery(Name = "saved")] public int? Saved { get; set; }
 
     private Models.User? _user;
     private bool _success;
     private bool _isAdmin;
     private string? _error;
+    private string _newEmail = string.Empty;
+    private string _emailCodeInput = string.Empty;
+    private bool _emailChanging;
+    private bool _emailCodeSent;
+    private bool _emailSuccess;
+    private string? _emailError;
 
     protected override async Task OnInitializedAsync()
     {
@@ -109,21 +157,90 @@
 
         try
         {
-            // On ne sauvegarde QUE les champs modifiables ici.
-            // L'email est protégé (confirmation mail requise).
             await UserService.SauvegarderProfilAsync(_user.Id, _user.DisplayName, _user.Language);
 
-            // On applique la langue choisie à toute l'interface : on passe par
-            // l'endpoint /Culture/Set (qui pose le cookie de langue puis recharge),
-            // exactement comme le sélecteur du header. Poser un cookie nécessite le
-            // HttpContext → impossible directement dans un composant interactif, d'où
-            // ce rechargement complet (forceLoad: true).
             var redirect = Uri.EscapeDataString("/profile?saved=1");
-            Nav.NavigateTo($"/Culture/Set?culture={_user.Language}&redirectUri={redirect}", forceLoad: true);
+            Nav.NavigateTo($"/auth/refresh-claims?culture={_user.Language}&returnUrl={redirect}", forceLoad: true);
         }
         catch (Exception ex)
         {
             _error = ex.Message;
+        }
+    }
+
+    private async Task SendEmailCodeAsync()
+    {
+        if (_user is null) return;
+        _emailError = null;
+
+        if (string.IsNullOrWhiteSpace(_newEmail))
+        {
+            _emailError = L["ChangePassword.FillAll"];
+            return;
+        }
+
+        var newEmail = _newEmail.Trim();
+
+        try
+        {
+            var taken = await UserService.EmailExistsAsync(newEmail);
+            if (taken)
+            {
+                _emailError = L["Register.EmailTaken"];
+                return;
+            }
+
+            _emailChanging = true;
+            var code = CodeService.GenerateCode(newEmail);
+            var language = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+            var template = await TemplateService.GetAsync("confirm_signup", language);
+
+            string subject;
+            string htmlBody;
+            if (template != null)
+            {
+                subject = template.Subject;
+                htmlBody = Regex.Replace(template.Html, @"\{\{\s*\.?Code\s*\}\}", code);
+            }
+            else
+            {
+                subject = "Votre code de confirmation";
+                htmlBody = $"<p>Votre code : <strong>{code}</strong> (valable 20 minutes).</p>";
+            }
+
+            await EmailService.EnvoyerEmailAsync(newEmail, subject, htmlBody);
+            _emailCodeSent = true;
+            _emailCodeInput = string.Empty;
+        }
+        catch (BusinessException ex)
+        {
+            _emailError = L[ex.Key];
+        }
+        finally
+        {
+            _emailChanging = false;
+        }
+    }
+
+    private async Task ValidateEmailCodeAsync()
+    {
+        if (_user is null) return;
+        _emailError = null;
+        _emailChanging = true;
+
+        try
+        {
+            CodeService.CheckCode(_newEmail.Trim(), _emailCodeInput);
+            await UserService.ChangeEmailAsync(_user.Id, _newEmail.Trim());
+            Nav.NavigateTo("/auth/logout", forceLoad: true);
+        }
+        catch (BusinessException ex)
+        {
+            _emailError = L[ex.Key];
+        }
+        finally
+        {
+            _emailChanging = false;
         }
     }
 }

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Portfolio.Data;
+using Portfolio.Exceptions;
 using Portfolio.Models;
 
 namespace Portfolio.Services;
@@ -16,10 +17,7 @@ public class UserService
 {
     private readonly AppDbContext _db;
 
-    public UserService(AppDbContext db)
-    {
-        _db = db;
-    }
+    public UserService(AppDbContext db) => _db = db;
 
     /// <summary>Lecture : retrouve un utilisateur par son id (null si introuvable).</summary>
     public async Task<User?> GetByIdAsync(ulong id)
@@ -62,16 +60,22 @@ public class UserService
         return await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
     }
 
+    /// <summary>Lecture : vérifie si un email est déjà utilisé.</summary>
+    public async Task<bool> EmailExistsAsync(string email)
+    {
+        return await _db.Users.AnyAsync(u => u.Email == email);
+    }
+
     /// <summary>
     /// Écriture : INSCRIPTION d'un nouvel utilisateur.
-    /// Vérifie que l'email n'est pas déjà utilisé (→ null).
+    /// Lance BusinessException("Register.EmailTaken") si l'email est déjà utilisé.
     /// Sinon crée le compte (bcrypt, rôle subscriber, email_confirmed=false) et renvoie l'id.
     /// </summary>
-    public async Task<ulong?> RegisterAsync(string email, string password, string displayName, string language)
+    public async Task<ulong> RegisterAsync(string email, string password, string displayName, string language)
     {
         var exists = await _db.Users.AnyAsync(u => u.Email == email);
         if (exists)
-            return null;
+            throw new BusinessException("Register.EmailTaken");
 
         var user = new User
         {
@@ -80,7 +84,7 @@ public class UserService
             PasswordHash = BCrypt.Net.BCrypt.HashPassword(password),
             Language = language,
             Role = "subscriber",
-            EmailConfirmed = false,
+            CreatedAt = DateTime.UtcNow,
         };
 
         _db.Users.Add(user);
@@ -89,48 +93,28 @@ public class UserService
     }
 
     /// <summary>
-    /// Écriture : confirme l'email d'un utilisateur (met email_confirmed = true).
-    /// </summary>
-    public async Task ConfirmEmailAsync(ulong id)
-    {
-        var user = await _db.Users.FindAsync(id);
-        if (user is null) return;
-        user.EmailConfirmed = true;
-        await _db.SaveChangesAsync();
-    }
-
-    /// <summary>
-    /// Écriture : CRÉE un compte. On hache le mot de passe (jamais en clair),
-    /// on ajoute la ligne, puis on enregistre en base.
-    /// Renvoie l'utilisateur créé (avec son Id rempli par la base).
-    /// </summary>
-    public async Task<User> CreerAsync(string email, string motDePasse, string displayName)
-    {
-        var user = new User
-        {
-            Email = email,
-            DisplayName = displayName,
-            PasswordHash = BCrypt.Net.BCrypt.HashPassword(motDePasse),
-            Role = "subscriber",   // rôle par défaut d'un nouvel inscrit
-        };
-
-        _db.Users.Add(user);            // <-- le fameux "Add"
-        await _db.SaveChangesAsync();   // c'est ICI que ça part en base MySQL
-        return user;
-    }
-
-    /// <summary>
     /// Écriture : MODIFIE le mot de passe d'un utilisateur existant.
+    /// Lance BusinessException("ChangePassword.TooShort") si trop court (1 car en dev, 6 en prod).
     /// </summary>
-    public async Task<bool> ChangerMotDePasseAsync(ulong id, string nouveauMotDePasse)
+    public async Task ChangerMotDePasseAsync(ulong id, string nouveauMotDePasse)
     {
+        if (string.IsNullOrWhiteSpace(nouveauMotDePasse))
+            throw new BusinessException("ChangePassword.TooShort");
+
+        var isDev = string.Equals(
+            Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
+            "Development", StringComparison.OrdinalIgnoreCase);
+        var minLength = isDev ? 1 : 6;
+
+        if (nouveauMotDePasse.Length < minLength)
+            throw new BusinessException("ChangePassword.TooShort");
+
         var user = await _db.Users.FirstOrDefaultAsync(u => u.Id == id);
         if (user is null)
-            return false;
+            throw new BusinessException("ChangePassword.Error");
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(nouveauMotDePasse);
-        var rowsAffected = await _db.SaveChangesAsync();
-        return rowsAffected > 0;
+        await _db.SaveChangesAsync();
     }
 
     /// <summary>
@@ -171,5 +155,23 @@ public class UserService
             return false;
 
         return BCrypt.Net.BCrypt.Verify(motDePasse, user.PasswordHash);
+    }
+
+    /// <summary>
+    /// Écriture : CHANGE l'email d'un utilisateur.
+    /// Lance BusinessException("Register.EmailTaken") si l'email est déjà pris.
+    /// </summary>
+    public async Task ChangeEmailAsync(ulong id, string newEmail)
+    {
+        var taken = await _db.Users.AnyAsync(u => u.Email == newEmail);
+        if (taken)
+            throw new BusinessException("Register.EmailTaken");
+
+        var user = await _db.Users.FindAsync(id);
+        if (user is null)
+            throw new BusinessException("ChangePassword.Error");
+
+        user.Email = newEmail;
+        await _db.SaveChangesAsync();
     }
 }

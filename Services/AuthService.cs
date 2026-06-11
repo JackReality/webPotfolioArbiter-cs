@@ -9,16 +9,17 @@ public record LoginResult(LoginStatus Status, User? User = null);
 
 public class AuthService
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
 
-    public AuthService(AppDbContext db)
+    public AuthService(IDbContextFactory<AppDbContext> factory)
     {
-        _db = db;
+        _factory = factory;
     }
 
     public async Task<LoginResult> VerifierIdentifiantsAsync(string email, string motDePasse)
     {
-        var user = await _db.Users.FirstOrDefaultAsync(u => u.Email == email);
+        await using var db = await _factory.CreateDbContextAsync();
+        var user = await db.Users.FirstOrDefaultAsync(u => u.Email == email);
         if (user is null)
             return new LoginResult(LoginStatus.InvalidCredentials);
 

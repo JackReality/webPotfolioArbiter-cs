@@ -25,6 +25,7 @@
             <MudTable Items="_trainings" Hover="true" Dense="true" Class="mb-6">
                 <HeaderContent>
                     <MudTh>Titre</MudTh>
+                    <MudTh>Code</MudTh>
                     <MudTh>Langue</MudTh>
                     <MudTh>Stripe Price ID</MudTh>
                     <MudTh>Créée le</MudTh>
@@ -32,6 +33,7 @@
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Titre">@context.Title</MudTd>
+                    <MudTd DataLabel="Code"><code>@context.Code</code></MudTd>
                     <MudTd DataLabel="Langue">@context.Language.ToUpper()</MudTd>
                     <MudTd DataLabel="Stripe Price ID">
                         @(string.IsNullOrWhiteSpace(context.StripePriceId) ? "—" : context.StripePriceId)
@@ -66,6 +68,9 @@
         <label class="pa-field-label">Titre *</label>
         <input class="pa-input" @bind="_title" />
 
+        <label class="pa-field-label mt-4">Code unique * <small style="opacity:.6">(ex : ALGO_PRO — majuscules, pas d'espaces)</small></label>
+        <input class="pa-input" @bind="_code" placeholder="ALGO_PRO" />
+
         <label class="pa-field-label mt-4">Langue *</label>
         <MudSelect @bind-Value="_language" Dense="true" Variant="Variant.Outlined" Class="mb-2">
             <MudSelectItem Value="@("fr")">Français</MudSelectItem>
@@ -75,6 +80,9 @@
 
         <label class="pa-field-label mt-4">Description (HTML) *</label>
         <textarea class="pa-textarea" rows="8" @bind="_descriptionHtml"></textarea>
+
+        <label class="pa-field-label mt-4">URL de la page formation <small style="opacity:.6">(ex : training/portfolio)</small></label>
+        <input class="pa-input" @bind="_pageUrl" placeholder="training/portfolio" />
 
         <label class="pa-field-label mt-4">Stripe Product ID</label>
         <input class="pa-input" @bind="_stripeProductId" placeholder="prod_..." />
@@ -113,10 +121,12 @@
     private string? _error;
 
     // Champs du formulaire (réutilisé pour l'ajout ET l'édition).
-    private ulong? _editingId;   // null = mode ajout ; sinon = id de la formation éditée
+    private ulong? _editingId;
     private string _title = string.Empty;
+    private string _code = string.Empty;
     private string _language = "fr";
     private string _descriptionHtml = string.Empty;
+    private string _pageUrl = string.Empty;
     private string _stripeProductId = string.Empty;
     private string _stripePriceId = string.Empty;
     private string _confirmationEmailHtml = string.Empty;
@@ -138,8 +148,10 @@
         _error = null;
         _editingId = training.Id;
         _title = training.Title;
+        _code = training.Code;
         _language = training.Language;
         _descriptionHtml = training.DescriptionHtml;
+        _pageUrl = training.PageUrl ?? string.Empty;
         _stripeProductId = training.StripeProductId ?? string.Empty;
         _stripePriceId = training.StripePriceId ?? string.Empty;
         _confirmationEmailHtml = training.ConfirmationEmailHtml ?? string.Empty;
@@ -151,7 +163,7 @@
     private void ReinitialiserFormulaire()
     {
         _editingId = null;
-        _title = _descriptionHtml = _stripeProductId = _stripePriceId = _confirmationEmailHtml = string.Empty;
+        _title = _code = _pageUrl = _descriptionHtml = _stripeProductId = _stripePriceId = _confirmationEmailHtml = string.Empty;
         _language = "fr";
         _error = null;
     }
@@ -161,12 +173,14 @@
     {
         _error = null;
 
-        if (string.IsNullOrWhiteSpace(_title) || string.IsNullOrWhiteSpace(_descriptionHtml))
+        if (string.IsNullOrWhiteSpace(_title) || string.IsNullOrWhiteSpace(_descriptionHtml) || string.IsNullOrWhiteSpace(_code))
         {
-            _error = "Le titre et la description sont obligatoires.";
+            _error = "Le titre, le code et la description sont obligatoires.";
             return;
         }
+        var code = _code.Trim().ToUpperInvariant();
 
+        var pageUrl = string.IsNullOrWhiteSpace(_pageUrl) ? null : _pageUrl.Trim().TrimStart('/');
         var productId = string.IsNullOrWhiteSpace(_stripeProductId) ? null : _stripeProductId.Trim();
         var priceId = string.IsNullOrWhiteSpace(_stripePriceId) ? null : _stripePriceId.Trim();
         var confirmationEmail = string.IsNullOrWhiteSpace(_confirmationEmailHtml) ? null : _confirmationEmailHtml;
@@ -176,13 +190,13 @@
             if (_editingId is null)
             {
                 await TrainingService.CreerAsync(
-                    _title.Trim(), _language, _descriptionHtml, productId, priceId, confirmationEmail);
+                    _title.Trim(), _language, _descriptionHtml, code, pageUrl, productId, priceId, confirmationEmail);
                 Snackbar.Add("Formation ajoutée.", Severity.Success);
             }
             else
             {
                 await TrainingService.UpdateAsync(
-                    _editingId.Value, _title.Trim(), _language, _descriptionHtml, productId, priceId, confirmationEmail);
+                    _editingId.Value, _title.Trim(), _language, _descriptionHtml, code, pageUrl, productId, priceId, confirmationEmail);
                 Snackbar.Add("Formation modifiée.", Severity.Success);
             }
 

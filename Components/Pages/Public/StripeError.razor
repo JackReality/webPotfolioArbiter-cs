@@ -1,0 +1,24 @@
+@page "/stripe-error"
+@inject IStringLocalizer<SharedResource> L
+@inject NavigationManager Navigation
+
+<PageTitle>Paiement annulé</PageTitle>
+
+<div class="pa-page" style="max-width:600px; text-align:center;">
+    <MudIcon Icon="@Icons.Material.Filled.ErrorOutline"
+             Color="Color.Error"
+             Style="font-size:4rem;"
+             Class="mb-4" />
+
+    <MudText Typo="Typo.h4" GutterBottom="true">Paiement non complété</MudText>
+    <MudText Class="mb-6" Style="opacity:.7;">
+        Votre paiement n'a pas abouti ou a été annulé. Aucun montant n'a été débité.
+    </MudText>
+
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Href="/training/portfolio"
+               StartIcon="@Icons.Material.Filled.ArrowBack">
+        Retour à la formation
+    </MudButton>
+</div>

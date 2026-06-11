@@ -10,6 +10,7 @@ using Portfolio.Data;
 using Portfolio.Services;
 using System.Globalization;
 using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +41,7 @@ var languesSupportees = new[] { "fr", "en", "es" };   // français par défaut
 // --- Base de données MySQL (EF Core + Pomelo) ------------------------------
 // On fixe la version du serveur manuellement (MySqlServerVersion) plutôt que
 // AutoDetect, pour que l'app démarre même si la base n'est pas encore lancée.
-builder.Services.AddDbContext<AppDbContext>(options =>
+builder.Services.AddDbContextFactory<AppDbContext>(options =>
     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 0))));
 
 // --- Authentification (cookie natif) ---------------------------------------
@@ -65,6 +66,7 @@ builder.Services.AddScoped<EmailTemplateService>();
 builder.Services.AddSingleton<CodeService>();
 builder.Services.AddScoped<EmailService>();
 builder.Services.AddScoped<TrainingService>();
+builder.Services.AddScoped<UserTrainingService>();
 builder.Services.AddScoped<StripeService>();
 
 var app = builder.Build();
@@ -200,6 +202,102 @@ app.MapGet("/auth/refresh-claims", async (
     return Results.LocalRedirect(returnUrl ?? "/");
 }).RequireAuthorization();
 
+app.MapGet("/stripe-ok", async (
+    HttpContext ctx,
+    [FromQuery(Name = "session_id")] string? sessionId,
+    UserService users,
+    UserTrainingService userTrainings,
+    TrainingService trainings,
+    EmailService email,
+    ILogger<Program> logger) =>
+{
+    if (string.IsNullOrWhiteSpace(sessionId))
+    {
+        logger.LogWarning("stripe-ok: session_id manquant");
+        return Results.LocalRedirect("/stripe-error");
+    }
+
+    try
+    {
+        var sessionService = new Stripe.Checkout.SessionService();
+        var session = await sessionService.GetAsync(sessionId);
+
+        logger.LogInformation("stripe-ok: session {Id} status={Status} payment_status={PaymentStatus}",
+            sessionId, session.Status, session.PaymentStatus);
+
+        // On accepte "paid" (paiement immédiat) ET "complete" avec paiement asynchrone.
+        if (session.PaymentStatus != "paid" && session.Status != "complete")
+        {
+            logger.LogWarning("stripe-ok: paiement non confirmé — status={Status} payment_status={PaymentStatus}", session.Status, session.PaymentStatus);
+            return Results.LocalRedirect("/stripe-error");
+        }
+
+        if (!ulong.TryParse(session.ClientReferenceId, out var userId))
+        {
+            logger.LogWarning("stripe-ok: ClientReferenceId invalide: {Ref}", session.ClientReferenceId);
+            return Results.LocalRedirect("/stripe-error");
+        }
+
+        string? trainingCode = null;
+        session.Metadata?.TryGetValue("training_code", out trainingCode);
+        if (string.IsNullOrWhiteSpace(trainingCode))
+        {
+            logger.LogWarning("stripe-ok: training_code absent des métadonnées");
+            return Results.LocalRedirect("/stripe-error");
+        }
+
+        // Évite un double-enregistrement si l'utilisateur recharge la page de retour.
+        var dejaAchete = await userTrainings.HasAccessAsync(userId, trainingCode);
+        if (!dejaAchete)
+            await userTrainings.CreateAsync(userId, trainingCode, sessionId);
+
+        var user = await users.GetByIdAsync(userId);
+        if (user == null)
+        {
+            logger.LogWarning("stripe-ok: utilisateur {UserId} introuvable", userId);
+            return Results.LocalRedirect("/stripe-error");
+        }
+
+        // Charge toutes les formations achetées pour les mettre dans le cookie.
+        var achats = await userTrainings.GetByUserAsync(userId);
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Name, user.DisplayName),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Role, "client"),
+        };
+        foreach (var achat in achats)
+            claims.Add(new Claim("training", achat.TrainingCode));
+
+        var principal = new ClaimsPrincipal(
+            new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme));
+        await ctx.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
+
+        // Email de confirmation si le template est renseigné sur la formation.
+        var training = await trainings.GetByCodeAsync(trainingCode);
+        if (training != null && !string.IsNullOrWhiteSpace(training.ConfirmationEmailHtml))
+        {
+            var htmlBody = Regex.Replace(training.ConfirmationEmailHtml,
+                @"\{\{\s*\.?(?:DisplayName|Name)\s*\}\}", user.DisplayName);
+            htmlBody = Regex.Replace(htmlBody,
+                @"\{\{\s*\.?Title\s*\}\}", training.Title);
+            try { await email.EnvoyerEmailAsync(user.Email, $"Confirmation d'achat — {training.Title}", htmlBody); }
+            catch (Exception ex) { logger.LogWarning(ex, "stripe-ok: échec envoi email de confirmation"); }
+        }
+
+        return Results.LocalRedirect($"/stripe-success?code={Uri.EscapeDataString(trainingCode)}");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "stripe-ok: exception non gérée pour session {SessionId}", sessionId);
+        return Results.LocalRedirect("/stripe-error");
+    }
+});
+
+//Active Blazor pour ce site, utilise le fichier App.razor comme point de départ
+//et active le mode interactif en temps réel via le serveur."
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 

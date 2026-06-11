@@ -1,0 +1,30 @@
+@page "/download"
+@attribute [Authorize(Roles = "subscriber,client,admin")]
+@inject IStringLocalizer<SharedResource> L
+
+<PageTitle>@L["Nav.Download"]</PageTitle>
+
+<div class="pa-page" style="max-width:600px;">
+    <MudText Typo="Typo.h3" GutterBottom="true">@L["Nav.Download"]</MudText>
+
+    <MudPaper Class="pa-5 mb-4" Elevation="0" Style="background:#1a1a1a;">
+        <MudText Typo="Typo.h6" GutterBottom="true">Fichier de suivi de portefeuille</MudText>
+        <MudText Class="mb-4" Style="opacity:.6;">
+            Copiez ce fichier Google Sheets dans votre Google Drive pour commencer à suivre vos investissements.
+        </MudText>
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large"
+                   StartIcon="@Icons.Material.Filled.TableChart"
+                   Href="#"
+                   Target="_blank">
+            Ouvrir dans Google Sheets
+        </MudButton>
+    </MudPaper>
+
+    <MudButton Variant="Variant.Text"
+               StartIcon="@Icons.Material.Filled.ArrowBack"
+               Href="/myspace">
+        Retour à Mon Espace
+    </MudButton>
+</div>

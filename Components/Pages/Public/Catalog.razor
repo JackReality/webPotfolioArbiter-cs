@@ -1,9 +1,15 @@
 @page "/catalog"
+@page "/trainings"
 @* Page PUBLIQUE : tout le monde peut consulter le catalogue. *@
 @using System.Globalization
+@using System.Security.Claims
+@using Portfolio.Exceptions
 @inject IStringLocalizer<SharedResource> L
 @inject TrainingService TrainingService
+@inject StripeService StripeService
 @inject ISnackbar Snackbar
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
 
 <PageTitle>Catalogue</PageTitle>
 
@@ -82,13 +88,33 @@
         _loaded = true;
     }
 
-    private Task AcheterAsync(Models.Training training)
+    private async Task AcheterAsync(Models.Training training)
     {
-        // TODO (Stripe) : construire la session Stripe Checkout à partir de
-        // training.StripePriceId, puis rediriger vers l'URL de paiement.
-        // En attente des clés Stripe dans .env et de la décision sur la montée
-        // en rôle (voir STATUS.md).
-        Snackbar.Add("Paiement bientôt disponible (Stripe à configurer).", Severity.Info);
-        return Task.CompletedTask;
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.Identity?.IsAuthenticated ?? true)
+        {
+            Navigation.NavigateTo("/login");
+            return;
+        }
+
+        var userId = ulong.Parse(user.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var baseUrl = Navigation.BaseUri.TrimEnd('/');
+
+        try
+        {
+            var stripeUrl = await StripeService.CreateCheckoutSessionAsync(
+                training,
+                userId,
+                successUrl: $"{baseUrl}/stripe-ok?session_id={{CHECKOUT_SESSION_ID}}",
+                cancelUrl:  $"{baseUrl}/catalog");
+
+            Navigation.NavigateTo(stripeUrl, forceLoad: true);
+        }
+        catch (BusinessException ex)
+        {
+            Snackbar.Add(L[ex.Key], Severity.Warning);
+        }
     }
 }

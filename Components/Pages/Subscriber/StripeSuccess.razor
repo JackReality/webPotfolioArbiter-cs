@@ -1,0 +1,65 @@
+@page "/stripe-success"
+@attribute [Authorize(Roles = "subscriber,client,admin")]
+@inject TrainingService TrainingService
+@inject NavigationManager Navigation
+
+<PageTitle>Paiement confirmé</PageTitle>
+
+<div class="pa-page" style="max-width:600px; text-align:center;">
+
+    @if (!_loaded)
+    {
+        <MudProgressLinear Color="Color.Success" Indeterminate="true" />
+    }
+    else
+    {
+        <MudIcon Icon="@Icons.Material.Filled.CheckCircle"
+                 Style="font-size:5rem; color:#4caf50;"
+                 Class="mb-4 mt-8" />
+
+        <MudText Typo="Typo.h4" GutterBottom="true">Paiement confirmé !</MudText>
+
+        <MudText Class="mb-6" Style="opacity:.7; font-size:1.1rem;">
+            Merci pour votre achat.
+            @if (_training is not null)
+            {
+                <text> Vous avez maintenant accès à <strong>@_training.Title</strong>.</text>
+            }
+        </MudText>
+
+        @if (_training is not null && !string.IsNullOrWhiteSpace(_training.PageUrl))
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       Size="Size.Large"
+                       StartIcon="@Icons.Material.Filled.PlayArrow"
+                       Href="@($"/{_training.PageUrl.TrimStart('/')}")">
+                Accéder à la formation
+            </MudButton>
+        }
+
+        <div class="mt-4">
+            <MudButton Variant="Variant.Text"
+                       StartIcon="@Icons.Material.Filled.AccountCircle"
+                       Href="/myspace">
+                Mon Espace
+            </MudButton>
+        </div>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery(Name = "code")]
+    public string? Code { get; set; }
+
+    private bool _loaded;
+    private Models.Training? _training;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(Code))
+            _training = await TrainingService.GetByCodeAsync(Code);
+
+        _loaded = true;
+    }
+}

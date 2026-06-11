@@ -29,6 +29,14 @@ public class Training
 
     // Identifiants Stripe (le "produit" et son "prix"). Servent à construire
     // le lien de paiement. Peuvent être vides tant que Stripe n'est pas configuré.
+    // Code unique de la formation (ex. "ALGO_PRO"). Sert de clé stable pour les accès.
+    [Column("code")]
+    public string Code { get; set; } = string.Empty;
+
+    // URL relative de la page de la formation (ex. "training/portfolio").
+    [Column("page_url")]
+    public string? PageUrl { get; set; }
+
     [Column("stripe_product_id")]
     public string? StripeProductId { get; set; }
 

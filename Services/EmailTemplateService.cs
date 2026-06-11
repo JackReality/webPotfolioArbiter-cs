@@ -4,74 +4,58 @@ using Portfolio.Models;
 
 namespace Portfolio.Services;
 
-/// <summary>
-/// Gestion des templates d'emails (table "email_templates").
-/// Permet de lire et modifier le contenu des emails envoyés aux utilisateurs.
-/// </summary>
 public class EmailTemplateService
 {
-    private readonly AppDbContext _db;
+    private readonly IDbContextFactory<AppDbContext> _factory;
 
-    public EmailTemplateService(AppDbContext db)
+    public EmailTemplateService(IDbContextFactory<AppDbContext> factory)
     {
-        _db = db;
+        _factory = factory;
     }
 
-    /// <summary>
-    /// Retourne TOUS les templates, groupés par type (key).
-    /// Ex : une liste de 9 lignes (3 types × 3 langues).
-    /// </summary>
     public async Task<List<EmailTemplate>> GetAllAsync()
     {
-        return await _db.EmailTemplates
+        await using var db = await _factory.CreateDbContextAsync();
+        return await db.EmailTemplates
             .OrderBy(t => t.Key)
             .ThenBy(t => t.Language)
             .ToListAsync();
     }
 
-    /// <summary>
-    /// Retourne les 3 templates (FR/EN/ES) pour un type donné.
-    /// Ex : GetAllByTypeAsync("recovery") → 3 lignes.
-    /// </summary>
     public async Task<List<EmailTemplate>> GetAllByTypeAsync(string key)
     {
-        return await _db.EmailTemplates
+        await using var db = await _factory.CreateDbContextAsync();
+        return await db.EmailTemplates
             .Where(t => t.Key == key)
             .OrderBy(t => t.Language)
             .ToListAsync();
     }
 
-    /// <summary>
-    /// Retourne UN template pour un type (key) et une langue donnés.
-    /// Si la langue demandée n'existe pas, on retombe sur le français ("fr").
-    /// Renvoie null si même le template français est absent.
-    /// </summary>
     public async Task<EmailTemplate?> GetAsync(string key, string language)
     {
-        var template = await _db.EmailTemplates
+        await using var db = await _factory.CreateDbContextAsync();
+        var template = await db.EmailTemplates
             .FirstOrDefaultAsync(t => t.Key == key && t.Language == language);
 
         if (template is null && language != "fr")
         {
-            template = await _db.EmailTemplates
+            template = await db.EmailTemplates
                 .FirstOrDefaultAsync(t => t.Key == key && t.Language == "fr");
         }
 
         return template;
     }
 
-    /// <summary>
-    /// Sauvegarde les modifications (subject + html) d'un template.
-    /// </summary>
     public async Task SaveAsync(ulong id, string subject, string html)
     {
-        var template = await _db.EmailTemplates.FindAsync(id);
+        await using var db = await _factory.CreateDbContextAsync();
+        var template = await db.EmailTemplates.FindAsync(id);
         if (template is null)
             throw new Exception("Template introuvable.");
 
         template.Subject = subject;
         template.Html = html;
         template.UpdatedAt = DateTime.UtcNow;
-        await _db.SaveChangesAsync();
+        await db.SaveChangesAsync();
     }
 }

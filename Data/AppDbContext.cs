@@ -26,4 +26,7 @@ public class AppDbContext : DbContext
 
     // Les formations vendues sur le site (table "trainings").
     public DbSet<Training> Trainings => Set<Training>();
+
+    // Les achats de formations par utilisateur.
+    public DbSet<UserTraining> UserTrainings => Set<UserTraining>();
 }

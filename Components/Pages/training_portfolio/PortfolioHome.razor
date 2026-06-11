@@ -1,0 +1,49 @@
+@page "/training/portfolio_home"
+@using System.Security.Claims
+@inject IStringLocalizer<SharedResource> L
+@inject TrainingService TrainingService
+@inject NavigationManager Navigation
+@inject AuthenticationStateProvider AuthStateProvider
+
+<PageTitle>Formation Portfolio</PageTitle>
+
+<div class="pa-page" style="max-width:900px;">
+
+    @if (!_loaded)
+    {
+        <MudProgressLinear Color="Color.Info" Indeterminate="true" />
+    }
+    else if (_training is null)
+    {
+        <MudAlert Severity="Severity.Warning">Formation introuvable.</MudAlert>
+    }
+    else
+    {
+        <MudText Typo="Typo.h3" GutterBottom="true">@_training.Title</MudText>
+
+        <div class="pa-formation-desc mt-4">
+            @((MarkupString)_training.DescriptionHtml)
+        </div>
+    }
+
+</div>
+
+@code {
+    private bool _loaded;
+    private Models.Training? _training;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (!user.HasClaim("training", "PORTFOLIO"))
+        {
+            Navigation.NavigateTo("/access-denied", forceLoad: true);
+            return;
+        }
+
+        _training = await TrainingService.GetByCodeAsync("PORTFOLIO");
+        _loaded = true;
+    }
+}

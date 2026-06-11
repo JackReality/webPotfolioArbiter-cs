@@ -6,25 +6,12 @@ Règle : 7 sections maximum. Section 1 = À faire. Sections 2-7 = Fait le YYYY-M
 
 ## 1. À faire
 
-### Stripe — paiement
+### Stripe — tâches Jack restantes
+- [ ] Basculer sur la clé live dans `.env` quand prêt pour la production : `STRIPE_SECRET_KEY=sk_live_...`
 
-Principe : le rôle passe de `subscriber` à `client` uniquement après vérification serveur que Stripe a bien encaissé le paiement.
-
-Tâches Jack :
-- [ ] Mettre la vraie clé live dans `.env` : `STRIPE_SECRET_KEY=sk_live_...`
-- [ ] Dans le dashboard Stripe, créer un webhook pointant vers `https://portfolioarbiter.com/stripe/webhook`, événement `checkout.session.completed`, puis copier la clé `whsec_...` dans `.env` : `STRIPE_WEBHOOK_SECRET=whsec_...` *(pour étape 3)*
-
-Tâches Claude :
-- [x] Étape 1 — Terrain : package `Stripe.net`, placeholders `.env`, `StripeService.CreateCheckoutSessionAsync`
-- [ ] Étape 2 — Bouton Acheter dans le catalogue : non connecté → `/login`, connecté → session Stripe → redirect
-- [ ] Étape 3 — Pages de retour : `/stripe-ok` (vérifie paiement via Stripe, monte le rôle) + `/stripe-error`
-- [ ] Étape 4 — Email de confirmation après achat via `training.ConfirmationEmailHtml`
-
-### Pages de contenu
-
-- [ ] `/download` : bouton de copie de la Google Sheet selon le rôle
-- [ ] `/training` : présentation de la formation + bouton achat
-- [ ] `/client-area` : contenu réservé aux clients
+### Pages formation PORTFOLIO
+- [ ] Contenu de `PortfolioHome.razor` (`/training/portfolio_home`) — actuellement affiche juste la description
+- [ ] Autres pages de la formation (leçons, etc.) dans `training_portfolio/`
 
 ### Admin
 
@@ -33,13 +20,40 @@ Tâches Claude :
 
 ### Divers
 
+- [ ] URL Google Sheets dans `/download`
 - [ ] Remplir l'email de contact dans les Mentions légales (actuellement `contact@realityexplorer.com`)
 - [ ] Décider du sort de la table `schema_migrations` (supprimable)
-- [ ] `EmailService` : mapping SSL explicite `465 → SslOnConnect` / `587 → StartTls` (optionnel, `Auto` fonctionne)
 
 ---
 
-## 2. Fait le 2026-06-10
+## 2. Fait le 2026-06-11
+
+### Stripe — flux complet ✅
+
+- [x] Colonne `code` + colonne `page_url` sur `trainings` (URL relative de la page formation)
+- [x] Table `user_trainings` + `UserTrainingService`
+- [x] `IDbContextFactory` sur tous les services (fix concurrence DbContext Blazor Server)
+- [x] Handler `/stripe-ok` : logging, check `status=complete || payment_status=paid`, re-emit cookie avec claim `training:<code>`, redirect `/stripe-success`
+- [x] Page `/stripe-success?code=...` : confirmation avec bouton "Accéder à la formation" → `training.PageUrl`
+- [x] Page `/stripe-error` : message d'erreur + bouton retour
+- [x] Admin : champ `page_url` dans le formulaire formations
+
+### Pages de formation
+
+- [x] Convention répertoires : `training_[code]/` (ex. `training_portfolio/`)
+- [x] `PortfolioHome.razor` → route `/training/portfolio_home`, accès restreint au claim `training:PORTFOLIO`
+
+### Réorganisation des pages
+
+- [x] Pages déplacées dans sous-dossiers : `Public/`, `Admin/`, `Subscriber/`, `training_portfolio/`
+- [x] Page `/myspace` (subscriber+) : ressources Google Sheets + formations achetées avec bouton Accéder → `training.PageUrl`
+- [x] Menu : "Mon Espace" si connecté, "Télécharger" sinon → `/myspace`
+- [x] Route `/trainings` ajoutée comme alias de `/catalog`
+- [x] Page `/download` (subscriber+) : lien Google Sheets
+
+---
+
+## 3. Fait le 2026-06-10
 
 ### Stripe — étape 1
 
@@ -67,7 +81,7 @@ Tâches Claude :
 
 ---
 
-## 3. Fait le 2026-06-09
+## 4. Fait le 2026-06-09
 
 ### Édition des formations
 
@@ -88,7 +102,7 @@ Tâches Claude :
 
 ---
 
-## 4. Fait le 2026-06-08
+## 5. Fait le 2026-06-08
 
 ### Documentation et conventions
 
@@ -116,7 +130,7 @@ Tâches Claude :
 
 ---
 
-## 5. Fait le 2026-06-07
+## 6. Fait le 2026-06-07
 
 ### Authentification
 
@@ -130,7 +144,7 @@ Tâches Claude :
 
 ---
 
-## 6. Fait le 2026-06-06
+## 7. Fait le 2026-06-06
 
 ### Socle
 

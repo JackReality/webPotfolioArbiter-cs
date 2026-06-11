@@ -30,8 +30,8 @@ dans le code C#. EF Core ne les invente pas : il les suit.
 |---|---|---|
 | `users` | Comptes (login, rôle). | À la main (modèle `User` mappe la table existante). |
 | `email_templates` | Modèles d'emails (FR/EN/ES). **Global**, pas lié à un user. | SQL. |
-| `email_tokens` | Jetons temporaires (confirmation, reset). | SQL. |
-| `trainings` | Formations vendues (**une par langue**, colonne `language`). **Global**, pas lié à un user. | SQL. |
+| `trainings` | Formations vendues (**une par langue**, colonne `language`, colonne `code` unique ex. `PORTFOLIO`, colonne `page_url` ex. `training/portfolio_home`). **Global**, pas lié à un user. | SQL. |
+| `user_trainings` | Achats : lie un `user_id` à un `training_code` + session Stripe. Crée un claim `training:<code>` dans le cookie. | SQL. |
 | `schema_migrations` | Historique de migrations (origine Supabase). À nettoyer un jour. | — |
 
 ## Règles de liaison actuelles
@@ -39,13 +39,41 @@ dans le code C#. EF Core ne les invente pas : il les suit.
 | Enfant | Colonne | → Parent | Colonne | ON DELETE |
 |---|---|---|---|---|
 | `email_tokens` | `user_id` | `users` | `id` | **CASCADE** |
+| `user_trainings` | `user_id` | `users` | `id` | **CASCADE** |
 
 ➡️ **Conséquence pratique** : supprimer un utilisateur efface **automatiquement**
-ses lignes dans `email_tokens`. Aucune autre table ne dépend de `users`
-aujourd'hui, donc la suppression d'un compte est **propre et complète**.
+ses lignes dans `user_trainings` (accès aux formations perdus). `email_templates`
+et `trainings` ne référencent **pas** `users` : données globales, non concernées.
 
-> `email_templates` et `trainings` ne référencent **pas** `users` : ce sont des
-> données globales, elles ne sont pas concernées par la suppression d'un compte.
+### Schéma `trainings`
+
+```sql
+CREATE TABLE trainings (
+  id                    BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  title                 VARCHAR(255) NOT NULL,
+  language              VARCHAR(10)  NOT NULL DEFAULT 'fr',
+  description_html      TEXT         NOT NULL,
+  code                  VARCHAR(50)  NOT NULL UNIQUE,
+  page_url              VARCHAR(255) DEFAULT NULL,  -- ex. training/portfolio_home
+  stripe_product_id     VARCHAR(100) DEFAULT NULL,
+  stripe_price_id       VARCHAR(100) DEFAULT NULL,
+  confirmation_email_html TEXT        DEFAULT NULL,
+  created_at            DATETIME     NOT NULL
+);
+```
+
+### Schéma `user_trainings`
+
+```sql
+CREATE TABLE user_trainings (
+  id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+  user_id           BIGINT UNSIGNED NOT NULL,
+  training_code     VARCHAR(50)     NOT NULL,
+  stripe_session_id VARCHAR(255)    DEFAULT NULL,
+  purchased_at      DATETIME        NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+```
 
 ## Comment vérifier (source de vérité)
 

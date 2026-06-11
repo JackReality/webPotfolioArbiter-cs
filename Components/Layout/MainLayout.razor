@@ -25,8 +25,15 @@
 
         <nav class="d-none d-md-flex">
             <a href="/" class="pa-navlink @Active("")">@L["Nav.Home"]</a>
-            <a href="/download" class="pa-navlink @Active("download")">@L["Nav.Download"]</a>
             <a href="/catalog" class="pa-navlink @Active("catalog")">@L["Nav.Training"]</a>
+            <AuthorizeView Roles="subscriber,client,admin">
+                <Authorized>
+                    <a href="/myspace" class="pa-navlink @Active("myspace")">Mon Espace</a>
+                </Authorized>
+                <NotAuthorized>
+                    <a href="/myspace" class="pa-navlink @Active("myspace")">@L["Nav.Download"]</a>
+                </NotAuthorized>
+            </AuthorizeView>
             <a href="/contact" class="pa-navlink @Active("contact")">@L["Nav.Contact"]</a>
         </nav>
 

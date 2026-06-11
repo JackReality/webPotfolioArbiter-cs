@@ -31,6 +31,10 @@ public class StripeService
             SuccessUrl = successUrl,
             CancelUrl = cancelUrl,
             ClientReferenceId = userId.ToString(),
+            Metadata = new Dictionary<string, string>
+            {
+                ["training_code"] = training.Code,
+            },
         };
 
         var service = new SessionService();
